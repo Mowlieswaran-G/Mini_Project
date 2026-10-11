@@ -1,0 +1,58 @@
+{
+  "total_valid_observations_before_split": 354123,
+  "rows_dropped_due_to_missing_lags": 39317,
+  "training_row_count": 283298,
+  "testing_row_count": 70825,
+  "train_percentage": 80.0,
+  "test_percentage": 20.0,
+  "training_start_datetime": "2021-01-08 01:00:00",
+  "training_end_datetime": "2024-03-05 13:20:00",
+  "testing_start_datetime": "2024-03-05 13:25:00",
+  "testing_end_datetime": "2024-12-11 22:25:00",
+  "chronological_verification_passed": true,
+  "target_feature": "Power demand",
+  "input_features_count": 17,
+  "all_input_features": [
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "day_of_week",
+    "is_weekend",
+    "demand_lag_5min",
+    "demand_lag_1hour",
+    "demand_lag_24hour",
+    "demand_lag_7day",
+    "temp",
+    "dwpt",
+    "rhum",
+    "wdir",
+    "wspd",
+    "pres"
+  ],
+  "calendar_features": [
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "day_of_week",
+    "is_weekend"
+  ],
+  "historical_demand_lags": [
+    "demand_lag_5min",
+    "demand_lag_1hour",
+    "demand_lag_24hour",
+    "demand_lag_7day"
+  ],
+  "weather_features": [
+    "temp",
+    "dwpt",
+    "rhum",
+    "wdir",
+    "wspd",
+    "pres"
+  ],
+  "note_on_datetime": "datetime is preserved in CSV for reference/tracking but excluded from numerical feature matrix"
+}

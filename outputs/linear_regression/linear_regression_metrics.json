@@ -1,0 +1,48 @@
+{
+  "model": "Linear Regression Baseline",
+  "train_rows": 283298,
+  "test_rows": 70825,
+  "input_features_count": 17,
+  "train_metrics": {
+    "MAE": 22.86,
+    "RMSE": 40.99,
+    "R2": 0.9989
+  },
+  "test_metrics": {
+    "MAE": 25.24,
+    "RMSE": 43.23,
+    "R2": 0.999
+  },
+  "test_demand_actual_min": 1519.9,
+  "test_demand_actual_max": 8631.53,
+  "test_demand_predicted_min": 1527.8,
+  "test_demand_predicted_max": 8642.41,
+  "peak_observation": {
+    "datetime": "2024-06-19 15:05:00",
+    "actual_demand": 8631.53,
+    "predicted_demand": 8560.41,
+    "prediction_error_mw": -71.12,
+    "percentage_error": -0.82
+  },
+  "coefficients": {
+    "year": 0.5455974682266792,
+    "month": 0.108947232647228,
+    "day": -0.0030550167034805783,
+    "hour": -0.030838704919318845,
+    "minute": 0.02334129615152711,
+    "day_of_week": -0.12621537993377716,
+    "is_weekend": -0.43426448777706683,
+    "demand_lag_5min": 1.0462714419068346,
+    "demand_lag_1hour": -0.05108933932014699,
+    "demand_lag_24hour": 0.0029992436581952964,
+    "demand_lag_7day": 5.4129661328048696e-05,
+    "temp": 0.39451987600537686,
+    "dwpt": -0.40045244705362987,
+    "rhum": 0.16548578807239595,
+    "wdir": 0.0026125097679571664,
+    "wspd": 0.06567011166812603,
+    "pres": -0.06434768455548721
+  },
+  "intercept": -1046.4735,
+  "execution_status": "Success - Zero Errors"
+}

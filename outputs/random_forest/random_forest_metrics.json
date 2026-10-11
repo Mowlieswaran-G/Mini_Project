@@ -1,0 +1,51 @@
+{
+  "model": "Random Forest Regressor (n_estimators=100, max_depth=20, min_samples_leaf=2)",
+  "train_rows": 283298,
+  "test_rows": 70825,
+  "input_features_count": 17,
+  "timing": {
+    "training_time_seconds": 140.85,
+    "prediction_time_seconds": 1.02
+  },
+  "train_metrics": {
+    "MAE": 11.58,
+    "RMSE": 23.75,
+    "R2": 0.9996
+  },
+  "test_metrics": {
+    "MAE": 28.17,
+    "RMSE": 56.29,
+    "R2": 0.9983
+  },
+  "test_demand_actual_min": 1519.9,
+  "test_demand_actual_max": 8631.53,
+  "test_demand_predicted_min": 1519.97,
+  "test_demand_predicted_max": 7745.73,
+  "peak_observation": {
+    "datetime": "2024-06-19 15:05:00",
+    "actual_demand": 8631.53,
+    "predicted_demand": 7677.32,
+    "prediction_error_mw": -954.21,
+    "percentage_error": -11.05
+  },
+  "feature_importances": {
+    "demand_lag_5min": 0.9991531911278297,
+    "demand_lag_1hour": 0.0002902117515596986,
+    "hour": 7.630761998043613e-05,
+    "demand_lag_7day": 6.581456894518327e-05,
+    "minute": 6.35577246417899e-05,
+    "demand_lag_24hour": 6.21633984179203e-05,
+    "pres": 4.528823710956852e-05,
+    "temp": 3.9758461112434275e-05,
+    "day": 3.657166734921673e-05,
+    "dwpt": 3.6227612395019295e-05,
+    "rhum": 2.9136436669335053e-05,
+    "wdir": 2.843625608911071e-05,
+    "month": 2.1594397954640277e-05,
+    "wspd": 2.1251331084565265e-05,
+    "day_of_week": 1.7464690977290428e-05,
+    "year": 1.0996835970956319e-05,
+    "is_weekend": 2.027881913111311e-06
+  },
+  "execution_status": "Success - Zero Errors"
+}

@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Large model binaries (>100MB cannot be uploaded to GitHub without Git LFS)
+random_forest_delhi_powerdemand.pkl
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

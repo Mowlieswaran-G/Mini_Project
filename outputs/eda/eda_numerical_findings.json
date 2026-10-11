@@ -1,0 +1,210 @@
+{
+  "statistics": {
+    "count": 393440,
+    "mean": 3960.736469067711,
+    "std": 1300.4737731656585,
+    "min": 1302.08,
+    "1%": 1544.9839,
+    "5%": 1818.829,
+    "25%": 3074.9,
+    "50% (median)": 3832.3199999999997,
+    "75%": 4870.465,
+    "95%": 6206.081499999999,
+    "99%": 7048.834899999999,
+    "max": 8631.53,
+    "iqr": 1795.565,
+    "skewness": 0.2613568332534813,
+    "kurtosis": -0.40083710296790453
+  },
+  "patterns": {
+    "peak_hour": 11,
+    "peak_hour_avg_demand": 4454.433513273288,
+    "trough_hour": 4,
+    "trough_hour_avg_demand": 3176.356720556998,
+    "diurnal_swing_mw": 1278.0767927162897,
+    "weekday_avg_demand": 4000.8841969809896,
+    "weekend_avg_demand": 3861.120072378492,
+    "weekday_weekend_diff_mw": 139.76412460249776,
+    "weekday_weekend_diff_pct": 3.493330916899864,
+    "peak_month": 6,
+    "peak_month_avg_demand": 4858.022914691227,
+    "trough_month": 2,
+    "trough_month_avg_demand": 3219.576981274887,
+    "seasonal_swing_mw": 1638.4459334163398
+  },
+  "correlations_with_demand": {
+    "Power demand": 1.0,
+    "temp": 0.4696997125217665,
+    "dwpt": 0.2854088989964382,
+    "rhum": -0.17655938457065387,
+    "wdir": 0.10313441207360517,
+    "wspd": 0.2526688134212418,
+    "pres": -0.4044490990768674,
+    "month": 0.04479178002292153,
+    "hour": 0.2232190993230623
+  },
+  "top_10_high": [
+    {
+      "datetime": "2024-06-19 15:05:00",
+      "Power demand": 8631.53,
+      "temp": 42.4,
+      "rhum": 38.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-18 15:15:00",
+      "Power demand": 8610.85,
+      "temp": 43.8,
+      "rhum": 27.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-19 15:25:00",
+      "Power demand": 8599.24,
+      "temp": 42.4,
+      "rhum": 38.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-19 15:30:00",
+      "Power demand": 8597.79,
+      "temp": 43.0,
+      "rhum": 25.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-18 15:10:00",
+      "Power demand": 8592.75,
+      "temp": 43.8,
+      "rhum": 27.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-18 15:20:00",
+      "Power demand": 8590.78,
+      "temp": 43.8,
+      "rhum": 27.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-18 15:05:00",
+      "Power demand": 8583.9,
+      "temp": 43.8,
+      "rhum": 27.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-19 15:40:00",
+      "Power demand": 8583.1,
+      "temp": 43.0,
+      "rhum": 25.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-19 15:20:00",
+      "Power demand": 8576.15,
+      "temp": 42.4,
+      "rhum": 38.0,
+      "month": 6,
+      "hour": 15
+    },
+    {
+      "datetime": "2024-06-18 15:00:00",
+      "Power demand": 8566.37,
+      "temp": 43.8,
+      "rhum": 27.0,
+      "month": 6,
+      "hour": 15
+    }
+  ],
+  "top_10_low": [
+    {
+      "datetime": "2022-08-01 03:55:00",
+      "Power demand": 1302.08,
+      "temp": 28.0,
+      "rhum": 94.0,
+      "month": 8,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-08-01 03:50:00",
+      "Power demand": 1302.85,
+      "temp": 28.0,
+      "rhum": 94.0,
+      "month": 8,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-09-01 03:15:00",
+      "Power demand": 1309.3,
+      "temp": 30.0,
+      "rhum": 77.0,
+      "month": 9,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-09-01 03:05:00",
+      "Power demand": 1317.01,
+      "temp": 30.0,
+      "rhum": 77.0,
+      "month": 9,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-09-01 03:20:00",
+      "Power demand": 1317.33,
+      "temp": 30.0,
+      "rhum": 77.0,
+      "month": 9,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-08-01 04:00:00",
+      "Power demand": 1318.11,
+      "temp": 28.0,
+      "rhum": 94.0,
+      "month": 8,
+      "hour": 4
+    },
+    {
+      "datetime": "2022-08-01 04:10:00",
+      "Power demand": 1319.61,
+      "temp": 28.0,
+      "rhum": 94.0,
+      "month": 8,
+      "hour": 4
+    },
+    {
+      "datetime": "2022-09-01 03:10:00",
+      "Power demand": 1319.8,
+      "temp": 30.0,
+      "rhum": 77.0,
+      "month": 9,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-09-01 03:30:00",
+      "Power demand": 1320.78,
+      "temp": 29.0,
+      "rhum": 89.0,
+      "month": 9,
+      "hour": 3
+    },
+    {
+      "datetime": "2022-09-01 03:40:00",
+      "Power demand": 1321.1,
+      "temp": 29.0,
+      "rhum": 89.0,
+      "month": 9,
+      "hour": 3
+    }
+  ]
+}

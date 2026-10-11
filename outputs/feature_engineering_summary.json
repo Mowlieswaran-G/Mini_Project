@@ -1,0 +1,218 @@
+{
+  "final_row_count": 393440,
+  "columns_count": 19,
+  "columns": [
+    "datetime",
+    "Power demand",
+    "year",
+    "month",
+    "day",
+    "hour",
+    "minute",
+    "day_of_week",
+    "is_weekend",
+    "demand_lag_5min",
+    "demand_lag_1hour",
+    "demand_lag_24hour",
+    "demand_lag_7day",
+    "temp",
+    "dwpt",
+    "rhum",
+    "wdir",
+    "wspd",
+    "pres"
+  ],
+  "missing_values_per_feature": {
+    "datetime": 0,
+    "Power demand": 0,
+    "year": 0,
+    "month": 0,
+    "day": 0,
+    "hour": 0,
+    "minute": 0,
+    "day_of_week": 0,
+    "is_weekend": 0,
+    "demand_lag_5min": 1151,
+    "demand_lag_1hour": 6377,
+    "demand_lag_24hour": 15746,
+    "demand_lag_7day": 19189,
+    "temp": 0,
+    "dwpt": 0,
+    "rhum": 0,
+    "wdir": 0,
+    "wspd": 0,
+    "pres": 0
+  },
+  "lag_statistics": {
+    "demand_lag_5min": {
+      "valid_count": 392289,
+      "missing_count": 1151,
+      "missing_pct": 0.2925,
+      "historical_delta": "0 days 00:05:00",
+      "lookahead_check": "Strictly historical past observation (Causal)"
+    },
+    "demand_lag_1hour": {
+      "valid_count": 387063,
+      "missing_count": 6377,
+      "missing_pct": 1.6208,
+      "historical_delta": "0 days 01:00:00",
+      "lookahead_check": "Strictly historical past observation (Causal)"
+    },
+    "demand_lag_24hour": {
+      "valid_count": 377694,
+      "missing_count": 15746,
+      "missing_pct": 4.0021,
+      "historical_delta": "1 days 00:00:00",
+      "lookahead_check": "Strictly historical past observation (Causal)"
+    },
+    "demand_lag_7day": {
+      "valid_count": 374251,
+      "missing_count": 19189,
+      "missing_pct": 4.8772,
+      "historical_delta": "7 days 00:00:00",
+      "lookahead_check": "Strictly historical past observation (Causal)"
+    }
+  },
+  "rows_with_all_lags_available": 354123,
+  "pct_rows_with_all_lags_available": 90.01,
+  "rows_dropped_if_na_lags_removed": 39317,
+  "pct_rows_dropped_if_na_lags_removed": 9.99,
+  "manual_inspections": [
+    {
+      "datetime": "2021-01-15 12:00:00",
+      "actual_demand": 4543.69,
+      "checks": [
+        {
+          "feature": "demand_lag_5min",
+          "past_timestamp": "2021-01-15 11:55:00",
+          "feature_value": 4560.21,
+          "expected_value": 4560.21,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_1hour",
+          "past_timestamp": "2021-01-15 11:00:00",
+          "feature_value": 4731.63,
+          "expected_value": 4731.63,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_24hour",
+          "past_timestamp": "2021-01-14 12:00:00",
+          "feature_value": 4391.79,
+          "expected_value": 4391.79,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_7day",
+          "past_timestamp": "2021-01-08 12:00:00",
+          "feature_value": 3967.31,
+          "expected_value": 3967.31,
+          "verified_match": true
+        }
+      ]
+    },
+    {
+      "datetime": "2022-06-10 15:30:00",
+      "actual_demand": 4618.78,
+      "checks": [
+        {
+          "feature": "demand_lag_5min",
+          "past_timestamp": "2022-06-10 15:25:00",
+          "feature_value": 4624.34,
+          "expected_value": 4624.34,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_1hour",
+          "past_timestamp": "2022-06-10 14:30:00",
+          "feature_value": 4549.53,
+          "expected_value": 4549.53,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_24hour",
+          "past_timestamp": "2022-06-09 15:30:00",
+          "feature_value": 6342.05,
+          "expected_value": 6342.05,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_7day",
+          "past_timestamp": "2022-06-03 15:30:00",
+          "feature_value": 2601.4,
+          "expected_value": 2601.4,
+          "verified_match": true
+        }
+      ]
+    },
+    {
+      "datetime": "2023-08-20 09:00:00",
+      "actual_demand": 4527.68,
+      "checks": [
+        {
+          "feature": "demand_lag_5min",
+          "past_timestamp": "2023-08-20 08:55:00",
+          "feature_value": 4529.75,
+          "expected_value": 4529.75,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_1hour",
+          "past_timestamp": "2023-08-20 08:00:00",
+          "feature_value": 4529.26,
+          "expected_value": 4529.26,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_24hour",
+          "past_timestamp": "2023-08-19 09:00:00",
+          "feature_value": 4721.65,
+          "expected_value": 4721.65,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_7day",
+          "past_timestamp": "2023-08-13 09:00:00",
+          "feature_value": 4090.68,
+          "expected_value": 4090.68,
+          "verified_match": true
+        }
+      ]
+    },
+    {
+      "datetime": "2024-06-19 15:05:00",
+      "actual_demand": 8631.53,
+      "checks": [
+        {
+          "feature": "demand_lag_5min",
+          "past_timestamp": "2024-06-19 15:00:00",
+          "feature_value": 8548.65,
+          "expected_value": 8548.65,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_1hour",
+          "past_timestamp": "2024-06-19 14:05:00",
+          "feature_value": 8196.16,
+          "expected_value": 8196.16,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_24hour",
+          "past_timestamp": "2024-06-18 15:05:00",
+          "feature_value": 8583.9,
+          "expected_value": 8583.9,
+          "verified_match": true
+        },
+        {
+          "feature": "demand_lag_7day",
+          "past_timestamp": "2024-06-12 15:05:00",
+          "feature_value": 3396.35,
+          "expected_value": 3396.35,
+          "verified_match": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "alignment_verified": true,
+  "test_observation_count": 70825,
+  "overall_metrics": {
+    "Linear Regression": {
+      "Test MAE (MW)": 25.24,
+      "Test RMSE (MW)": 43.23,
+      "Test R\u00b2": 0.999,
+      "Training Time (s)": 0.42,
+      "Prediction Time (s)": 0.05
+    },
+    "Random Forest": {
+      "Test MAE (MW)": 28.17,
+      "Test RMSE (MW)": 56.29,
+      "Test R\u00b2": 0.9983,
+      "Training Time (s)": 140.85,
+      "Prediction Time (s)": 1.02
+    }
+  },
+  "peak_comparison": {
+    "timestamp": "2024-06-19 15:05:00",
+    "actual_demand_mw": 8631.53,
+    "linear_regression_pred_mw": 8560.41,
+    "linear_regression_error_mw": -71.12,
+    "linear_regression_error_pct": -0.82,
+    "random_forest_pred_mw": 7677.32,
+    "random_forest_error_mw": -954.21,
+    "random_forest_error_pct": -11.05
+  },
+  "regime_analysis": {
+    "normal_demand": {
+      "definition": "Actual demand <= 75th percentile (<= 5589.38 MW)",
+      "observation_count": 53119,
+      "percentage_of_test_set": 75.0,
+      "linear_regression_mae_mw": 23.97,
+      "random_forest_mae_mw": 23.65
+    },
+    "high_demand": {
+      "definition": "Actual demand between 75th and 95th percentile (5589.38 to 6905.92 MW)",
+      "observation_count": 14164,
+      "percentage_of_test_set": 20.0,
+      "linear_regression_mae_mw": 28.67,
+      "random_forest_mae_mw": 31.35
+    },
+    "extreme_peak_demand": {
+      "definition": "Actual demand > 95th percentile (> 6905.92 MW)",
+      "observation_count": 3542,
+      "percentage_of_test_set": 5.0,
+      "linear_regression_mae_mw": 30.58,
+      "random_forest_mae_mw": 83.13
+    },
+    "top_1pct_super_extreme_peak": {
+      "definition": "Actual demand > 99th percentile (> 7654.84 MW)",
+      "observation_count": 709,
+      "percentage_of_test_set": 1.0,
+      "linear_regression_mae_mw": 27.78,
+      "random_forest_mae_mw": 243.52
+    }
+  }
+}
