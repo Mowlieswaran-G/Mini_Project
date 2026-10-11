@@ -8,9 +8,6 @@ env/
 venv/
 .venv/
 
-# Large model binaries (>100MB cannot be uploaded to GitHub without Git LFS)
-random_forest_delhi_powerdemand.pkl
-
 # IDE / OS files
 .vscode/
 .idea/
