@@ -70,14 +70,22 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
 }
 
-/* Floating White Canvas for Dashboard */
+/* Prevent Streamlit top bar from overlapping page content */
+header[data-testid="stHeader"] {
+    background: transparent !important;
+    z-index: 10 !important;
+    height: 48px !important;
+}
+
+/* Floating White Canvas for Dashboard with clean margins and no clipping */
 .block-container {
     background: #ffffff !important;
-    border-radius: 26px !important;
-    padding: 26px 30px 34px 30px !important;
-    margin: 14px 18px 24px 0 !important;
+    border-radius: 24px !important;
+    padding: 28px 34px 38px 34px !important;
+    margin-top: 8px !important;
+    margin-bottom: 24px !important;
     max-width: 98% !important;
-    box-shadow: 0 14px 44px rgba(0,0,0,0.16) !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important;
 }
 
 /* Floating White Sidebar Container */
@@ -87,10 +95,10 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
 }
 [data-testid="stSidebar"] > div:first-child {
     background: #ffffff !important;
-    border-radius: 24px !important;
-    margin: 14px 10px 24px 14px !important;
-    padding: 18px 12px !important;
-    box-shadow: 0 12px 36px rgba(0,0,0,0.14) !important;
+    border-radius: 22px !important;
+    margin: 8px 10px 24px 12px !important;
+    padding: 16px 12px !important;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.12) !important;
 }
 
 /* Typography & Base Text */
@@ -105,16 +113,29 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
 }
 
-/* Sidebar Navigation Items */
+/* Sidebar Navigation Items — Hide ugly default radio dots so buttons look clean */
+[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stWidgetLabel"] {
+    display: none !important;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] > label > div:first-child {
+    display: none !important;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
+    gap: 4px !important;
+}
 [data-testid="stSidebar"] [data-testid="stRadio"] label {
-    padding: 9px 12px !important;
+    padding: 10px 14px !important;
     border-radius: 12px !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 3px !important;
     transition: all 0.18s ease !important;
     cursor: pointer !important;
     font-size: 0.90rem !important;
     font-weight: 600 !important;
     color: #334155 !important;
+    border: 1px solid transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
     background: #eef9f2 !important;
@@ -172,15 +193,12 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 800;
 }
 
-/* NowEnergy Top 5-KPI Cards Row (Green pill header + white body) */
+/* NowEnergy Top 5-KPI Cards Row (Responsive auto-fit grid) */
 .ne-kpi-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 12px;
     margin-bottom: 22px;
-}
-@media (max-width: 1024px) {
-    .ne-kpi-row { grid-template-columns: repeat(2, 1fr); }
 }
 .ne-kpi-card {
     background: #ffffff;
@@ -1028,19 +1046,15 @@ def page_prediction(dfh):
         """, unsafe_allow_html=True)
 
         # Energy Storage / Capacity Donut Card from Reference Image
-        st.markdown(f"""
-        <div class="ne-storage-card">
-          <div class="ne-sc-title">🔋 Energy Storage</div>
-          <div style="display:flex;justify-content:center;">
-        """, unsafe_allow_html=True)
-        st.plotly_chart(nowenergy_capacity_gauge(pp), use_container_width=True)
-        st.markdown(f"""
-          <div class="ne-pill-legend">
-            <span class="ne-pl-item"><span style="color:#f97316">●</span> Main Power {min(100, int((pp/8631.53)*70))}%</span>
-            <span class="ne-pl-item"><span style="color:#32996e">●</span> Green Energy 25%</span>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<div class="ne-sc-title">🔋 Energy Storage</div>', unsafe_allow_html=True)
+            st.plotly_chart(nowenergy_capacity_gauge(pp), use_container_width=True)
+            st.markdown(f"""
+            <div class="ne-pill-legend">
+              <span class="ne-pl-item"><span style="color:#f97316">●</span> Main Power {min(100, int((pp/8631.53)*70))}%</span>
+              <span class="ne-pl-item"><span style="color:#32996e">●</span> Green Energy 25%</span>
+            </div>
+            """, unsafe_allow_html=True)
 
     # Step 4: Verification Table
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -1099,32 +1113,26 @@ def page_home(dfh):
     col_left, col_mid, col_right = st.columns([1.6, 1.1, 1.0])
 
     with col_left:
-        # Energy Usage combo chart (peach bars + green spline)
-        st.markdown("""
-        <div class="ne-box">
-          <div class="ne-box-title">📈 Energy Usage</div>
-        """, unsafe_allow_html=True)
-        recent_data = dfh.tail(288) # Last 24 hours of 5-min intervals
-        st.plotly_chart(nowenergy_combo_chart(recent_data, "Demand (MW) & Ambient Temperature (°C)"), use_container_width=True)
-        st.markdown("""
-          <div style="font-size:0.75rem;color:#64748b;background:#f8fafc;padding:8px 12px;border-radius:10px;margin-top:6px;line-height:1.5;">
-            <b>Energy consumption:</b> 4,414 MW avg &nbsp;|&nbsp; <b>House area:</b> Delhi Capital Region &nbsp;|&nbsp; <b>Average temperature:</b> 32.5°C
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<div class="ne-box-title">📈 Energy Usage</div>', unsafe_allow_html=True)
+            recent_data = dfh.tail(288) # Last 24 hours of 5-min intervals
+            st.plotly_chart(nowenergy_combo_chart(recent_data, "Demand (MW) & Ambient Temperature (°C)"), use_container_width=True)
+            st.markdown("""
+            <div style="font-size:0.75rem;color:#64748b;background:#f8fafc;padding:8px 12px;border-radius:10px;margin-top:6px;line-height:1.5;">
+              <b>Energy consumption:</b> 4,414 MW avg &nbsp;|&nbsp; <b>House area:</b> Delhi Capital Region &nbsp;|&nbsp; <b>Average temperature:</b> 32.5°C
+            </div>
+            """, unsafe_allow_html=True)
 
     with col_mid:
-        # Daily Energy Cost Donut
-        st.markdown("""
-        <div class="ne-box">
-          <div class="ne-box-title">📅 Daily Energy Cost</div>
-          <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
-            <span class="ne-pl-item"><span style="color:#f97316">●</span> Main Power 236 MW</span>
-            <span class="ne-pl-item"><span style="color:#32996e">●</span> Green energy 90 MW</span>
-          </div>
-        """, unsafe_allow_html=True)
-        st.plotly_chart(nowenergy_donut_chart(236, 90, "Total: 326 MW"), use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown("""
+            <div class="ne-box-title">📅 Daily Energy Cost</div>
+            <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
+              <span class="ne-pl-item"><span style="color:#f97316">●</span> Main Power 236 MW</span>
+              <span class="ne-pl-item"><span style="color:#32996e">●</span> Green energy 90 MW</span>
+            </div>
+            """, unsafe_allow_html=True)
+            st.plotly_chart(nowenergy_donut_chart(236, 90, "Total: 326 MW"), use_container_width=True)
 
     with col_right:
         # Energy Mode Orange Card
@@ -1141,26 +1149,20 @@ def page_home(dfh):
         """, unsafe_allow_html=True)
 
         # Energy Storage Card
-        st.markdown("""
-        <div class="ne-storage-card">
-          <div class="ne-sc-title">🔋 Energy Storage</div>
-        """, unsafe_allow_html=True)
-        st.plotly_chart(nowenergy_capacity_gauge(6500), use_container_width=True)
-        st.markdown("""
-          <div class="ne-pill-legend">
-            <span class="ne-pl-item"><span style="color:#f97316">●</span> Main Power 50%</span>
-            <span class="ne-pl-item"><span style="color:#32996e">●</span> Green Energy 25%</span>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
+        with st.container(border=True):
+            st.markdown('<div class="ne-sc-title">🔋 Energy Storage</div>', unsafe_allow_html=True)
+            st.plotly_chart(nowenergy_capacity_gauge(6500), use_container_width=True)
+            st.markdown("""
+            <div class="ne-pill-legend">
+              <span class="ne-pl-item"><span style="color:#f97316">●</span> Main Power 50%</span>
+              <span class="ne-pl-item"><span style="color:#32996e">●</span> Green Energy 25%</span>
+            </div>
+            """, unsafe_allow_html=True)
 
     # Bottom Full-Width Card: Carbon Footprint CO2
-    st.markdown("""
-    <div class="ne-box">
-      <div class="ne-box-title">🌿 Carbon Footprint CO2 & Demand Trajectory</div>
-    """, unsafe_allow_html=True)
-    st.plotly_chart(nowenergy_area_carbon(dfh.iloc[::288], "Delhi Power Demand & Emission Baseline (2021–2024)"), use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown('<div class="ne-box-title">🌿 Carbon Footprint CO2 & Demand Trajectory</div>', unsafe_allow_html=True)
+        st.plotly_chart(nowenergy_area_carbon(dfh.iloc[::288], "Delhi Power Demand & Emission Baseline (2021–2024)"), use_container_width=True)
 
     # 4 Pipeline Cards
     st.markdown("<hr>", unsafe_allow_html=True)
