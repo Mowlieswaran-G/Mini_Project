@@ -30,3 +30,30 @@ streamlit run app/app.py
 ```
 
 The app reads `cleaned_delhi_powerdemand_5min_2021_to_2024.csv`, the saved test-prediction CSVs, saved metrics in `outputs/`, and any available model pickle. The Linear Regression pickle is currently present at the project root. If the Random Forest pickle is absent, its saved evaluation results remain available but live Random Forest inference is shown as unavailable.
+
+## Docker Deployment
+
+You can run the entire Delhi Power System AI forecasting platform inside a Docker container without manually configuring a Python environment.
+
+### Option 1: Docker Compose (Recommended)
+
+```bash
+docker compose up --build -d
+```
+Access the application in your browser at `http://localhost:8501`.
+
+To stop the container:
+```bash
+docker compose down
+```
+
+### Option 2: Docker CLI
+
+```bash
+# Build the Docker image
+docker build -t delhi-power-demand-ai .
+
+# Run the container
+docker run -d -p 8501:8501 --name delhi_power_demand_app delhi-power-demand-ai
+```
+
