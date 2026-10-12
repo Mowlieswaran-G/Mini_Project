@@ -17,3 +17,16 @@ A machine learning project for analyzing and forecasting 5-minute interval power
 ## Outputs
 - Interactive HTML Dashboard: `outputs/project_dashboard/project_dashboard.html`
 - Analysis Reports: Located in `outputs/` directory.
+
+## Streamlit web application (Stage 11)
+
+The application in `app/` loads the saved cleaned dataset, evaluation artefacts and model files; it does not retrain either model. It provides pages for the project overview, data exploration, model performance, single-timestamp prediction, recursive future forecasting, peak analysis, and methodology.
+
+Install the required packages and start it from the project root:
+
+```bash
+pip install -r requirements.txt
+streamlit run app/app.py
+```
+
+The app reads `cleaned_delhi_powerdemand_5min_2021_to_2024.csv`, the saved test-prediction CSVs, saved metrics in `outputs/`, and any available model pickle. The Linear Regression pickle is currently present at the project root. If the Random Forest pickle is absent, its saved evaluation results remain available but live Random Forest inference is shown as unavailable.
