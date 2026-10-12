@@ -57,7 +57,7 @@ from utils.features import (FEATURE_COLUMNS, FEATURE_INFO, LAGS, SCENARIO_PRESET
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(page_title="NowEnergy | Delhi Power AI",
                    page_icon="⚡", layout="wide",
-                   initial_sidebar_state="expanded")
+                   initial_sidebar_state="collapsed")
 
 # ── NowEnergy CSS Theme ───────────────────────────────────────────────────────
 st.markdown("""
@@ -529,15 +529,42 @@ h1, h2, h3, h4, h5, h6 {
     text-transform: uppercase !important;
     font-size: 0.76rem !important;
 }
+/* Sleek Top Horizontal Navigation Bar */
+[data-testid="stTabs"] {
+    margin-bottom: 22px !important;
+}
+[data-testid="stTabs"] [role="tablist"] {
+    gap: 8px !important;
+    border-bottom: 1.5px solid #f1f5f9 !important;
+    padding-bottom: 10px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
 [data-testid="stTabs"] [role="tab"] {
     font-weight: 600 !important;
-    color: #64748b !important;
-    font-size: 0.90rem !important;
+    color: #475569 !important;
+    font-size: 0.88rem !important;
+    padding: 8px 18px !important;
+    border-radius: 12px !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #e2e8f0 !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+}
+[data-testid="stTabs"] [role="tab"]:hover {
+    background: #eef9f2 !important;
+    color: #15803d !important;
+    border-color: #86efac !important;
 }
 [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
-    color: #15803d !important;
+    background: #32996e !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
-    border-bottom: 2.5px solid #32996e !important;
+    border-color: #32996e !important;
+    box-shadow: 0 4px 14px rgba(50, 153, 110, 0.28) !important;
+}
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] * {
+    color: #ffffff !important;
 }
 [data-testid="stDataFrame"] {
     border: 1px solid #e2e8f0 !important;
@@ -773,19 +800,8 @@ with st.sidebar:
         <div style="font-size:0.72rem;color:#64748b;font-weight:500;">Natural Power of Energy</div>
       </div>
     </div>
-    <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;padding:0 6px 8px;">menu</div>
     """, unsafe_allow_html=True)
-
-    page = st.radio("menu", [
-        "⚡ Demand Prediction & What-If",
-        "🏠 Dashboard & System Overview",
-        "📊 Historical Data Explorer",
-        "🎯 Model Performance & Metrics",
-        "🔮 Future Demand Forecasting",
-        "🏔️ Peak Demand Analysis",
-        "📖 About & Methodology",
-    ], index=0, label_visibility="collapsed")
-
+    st.info("💡 **Navigation:** Use the horizontal tabs across the top of the dashboard for full-width layout.")
     st.markdown("<hr>", unsafe_allow_html=True)
     st.markdown("**🤖 AI Models Status**")
     lr_ok = is_model_available("linear_regression")
@@ -797,7 +813,7 @@ with st.sidebar:
 
 # ── Page 1: Demand Prediction & What-If ───────────────────────────────────────
 def page_prediction(dfh):
-    render_dash_bar("AI Electricity Demand Prediction & What-If Simulator")
+    st.markdown('<div class="st2" style="margin-top:0">⚡ AI Electricity Demand Prediction & Interactive What-If Simulator</div>', unsafe_allow_html=True)
 
     # 5 Top Cards directly matching NowEnergy
     st.markdown("""
@@ -955,7 +971,12 @@ def page_prediction(dfh):
     # Step 2: Prediction Trigger
     st.markdown("<hr>", unsafe_allow_html=True)
     st.markdown('<div class="st2">Step 2 — Run AI Forecast</div>', unsafe_allow_html=True)
-    st.button("🚀 Predict Electricity Demand Now", type="primary", use_container_width=True)
+    
+    col_btn, col_info = st.columns([1.5, 2])
+    with col_btn:
+        btn_clicked = st.button("🚀 Predict Electricity Demand Now", type="primary", use_container_width=True)
+    with col_info:
+        st.markdown("<div style='padding-top:8px;font-size:0.84rem;color:#64748b;'>⚡ Executes dual-model inference (Linear Regression & Random Forest) in <b>< 10ms</b>.</div>", unsafe_allow_html=True)
 
     fdf = make_custom_feature_row(feats)
     pl, pr = None, None
@@ -970,6 +991,12 @@ def page_prediction(dfh):
     pp = pl if pkey == "linear_regression" else (pr or pl)
     if pp is None:
         st.warning("No model .pkl file found."); return
+
+    rg = classify_demand_regime(pp)
+    
+    if btn_clicked:
+        st.toast(f"⚡ AI Demand Projected: {pp:,.1f} MW ({rg['badge']})", icon="⚡")
+        st.success(f"✅ **AI Forecast Computed Successfully!** Projected Grid Demand: **{pp:,.2f} MW** ({pp/1000:.3f} GW) • Operating Tier: **{rg['badge']}** • Grid Stress: **{rg['stress']}**")
 
     # Step 3: NowEnergy Output Layout
     st.markdown("<hr>", unsafe_allow_html=True)
@@ -1076,8 +1103,6 @@ def page_prediction(dfh):
 
 # ── Page 2: Dashboard & System Overview ───────────────────────────────────────
 def page_home(dfh):
-    render_dash_bar("Natural Power of Energy • Delhi SLDC 5-Min Telemetry")
-
     # The 5 Top Cards exactly like the image
     st.markdown("""
     <div class="ne-kpi-row">
@@ -1178,7 +1203,7 @@ def page_home(dfh):
 
 # ── Page 3: Historical Data Explorer ──────────────────────────────────────────
 def page_explorer(dfh):
-    render_dash_bar("Historical Load Profiles, Diurnal Curves & Atmospheric Dependencies")
+    st.markdown('<div class="st2" style="margin-top:0">📊 Historical Load Profiles, Diurnal Curves & Atmospheric Dependencies</div>', unsafe_allow_html=True)
     mn, mx = dfh.datetime.min().date(), dfh.datetime.max().date()
     dates = st.date_input("📅 Date Range Selection", value=(date(2024, 6, 1), date(2024, 6, 30)), min_value=mn, max_value=mx)
     if len(dates) != 2: st.info("Please select both start and end dates."); return
@@ -1247,7 +1272,7 @@ def page_explorer(dfh):
 
 # ── Page 4: Model Performance ─────────────────────────────────────────────────
 def page_performance():
-    render_dash_bar("Hold-Out Test Benchmark (70,825 Intervals • March–Dec 2024)")
+    st.markdown('<div class="st2" style="margin-top:0">🎯 Hold-Out Test Benchmark (70,825 Intervals • March–Dec 2024)</div>', unsafe_allow_html=True)
     lm2 = load_json("outputs/linear_regression/linear_regression_metrics.json")["test_metrics"]
     rm2 = load_json("outputs/random_forest/random_forest_metrics.json")["test_metrics"]
     comp = load_json("outputs/model_comparison/model_comparison_summary.json")
@@ -1578,18 +1603,36 @@ def page_about():
           • Captures non-linear meteorological and humidity interactions across normal load tiers.</p>
         </div>""", unsafe_allow_html=True)
 
-# ── Router ────────────────────────────────────────────────────────────────────
-if page.startswith("⚡"):
-    page_prediction(history)
-elif page.startswith("🏠"):
+# ── Top Dashboard Header & Horizontal Navigation Tabs ─────────────────────────
+render_dash_bar("Natural Power of Energy • Delhi State Grid Command Center")
+
+tab_home, tab_pred, tab_fc, tab_exp, tab_perf, tab_peaks, tab_about = st.tabs([
+    "🏠 Dashboard Overview",
+    "⚡ Demand Prediction & What-If",
+    "🔮 Future Demand Forecasting",
+    "📊 Historical Data Explorer",
+    "🎯 Model Performance & Metrics",
+    "🏔️ Peak Demand Analysis",
+    "📖 About & Methodology",
+])
+
+with tab_home:
     page_home(history)
-elif page.startswith("📊"):
-    page_explorer(history)
-elif page.startswith("🎯"):
-    page_performance()
-elif page.startswith("🔮"):
+
+with tab_pred:
+    page_prediction(history)
+
+with tab_fc:
     page_forecast(history)
-elif page.startswith("🏔️"):
+
+with tab_exp:
+    page_explorer(history)
+
+with tab_perf:
+    page_performance()
+
+with tab_peaks:
     page_peaks(history)
-else:
+
+with tab_about:
     page_about()
