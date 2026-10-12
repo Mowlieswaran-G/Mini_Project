@@ -57,7 +57,7 @@ from utils.features import (FEATURE_COLUMNS, FEATURE_INFO, LAGS, SCENARIO_PRESET
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(page_title="NowEnergy | Delhi Power AI",
                    page_icon="⚡", layout="wide",
-                   initial_sidebar_state="collapsed")
+                   initial_sidebar_state="expanded")
 
 # ── NowEnergy CSS Theme ───────────────────────────────────────────────────────
 st.markdown("""
@@ -65,9 +65,16 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
 /* Sage-green outer canvas from the reference image */
-html, body, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+html, body {
     background-color: #3b876a !important;
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
+}
+
+/* App Container: True side-by-side flexbox layout so sidebar NEVER overlaps the main page */
+[data-testid="stAppViewContainer"] {
+    display: flex !important;
+    flex-direction: row !important;
+    background-color: #3b876a !important;
 }
 
 /* Prevent Streamlit top bar from overlapping page content */
@@ -77,28 +84,46 @@ header[data-testid="stHeader"] {
     height: 48px !important;
 }
 
+/* Floating White Sidebar: Fixed width in flex flow, natural left positioning, no overlapping */
+section[data-testid="stSidebar"] {
+    background-color: #3b876a !important;
+    border-right: none !important;
+    position: relative !important;
+    flex: 0 0 270px !important;
+    width: 270px !important;
+    min-width: 270px !important;
+    max-width: 270px !important;
+    z-index: 20 !important;
+    transform: none !important;
+}
+
+section[data-testid="stSidebar"] > div:first-child {
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    margin: 12px 6px 20px 14px !important;
+    padding: 16px 12px !important;
+    box-shadow: 0 10px 32px rgba(0,0,0,0.12) !important;
+    height: calc(100vh - 32px) !important;
+    overflow-y: auto !important;
+}
+
+/* Main Content Area: fills remaining space side-by-side with zero overlap */
+[data-testid="stMain"] {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    background-color: #3b876a !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+}
+
 /* Floating White Canvas for Dashboard with clean margins and no clipping */
 .block-container {
     background: #ffffff !important;
-    border-radius: 24px !important;
-    padding: 28px 34px 38px 34px !important;
-    margin-top: 8px !important;
-    margin-bottom: 24px !important;
-    max-width: 98% !important;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important;
-}
-
-/* Floating White Sidebar Container */
-[data-testid="stSidebar"] {
-    background-color: #3b876a !important;
-    border-right: none !important;
-}
-[data-testid="stSidebar"] > div:first-child {
-    background: #ffffff !important;
     border-radius: 22px !important;
-    margin: 8px 10px 24px 12px !important;
-    padding: 16px 12px !important;
-    box-shadow: 0 10px 32px rgba(0,0,0,0.12) !important;
+    padding: 24px 30px 34px 30px !important;
+    margin: 12px 14px 20px 6px !important;
+    max-width: calc(100% - 20px) !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important;
 }
 
 /* Typography & Base Text */
@@ -793,16 +818,27 @@ def render_dash_bar(subtitle="Delhi State Grid Command Center"):
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
-    <div style="display:flex;align-items:center;gap:12px;padding:4px 6px 16px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:4px 6px 14px;">
       <div style="width:38px;height:38px;background:#32996e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:1.2rem;box-shadow:0 4px 10px rgba(50,153,110,0.3);">⚡</div>
       <div>
         <div style="font-size:1.15rem;font-weight:800;color:#0f172a;line-height:1.1;">NowEnergy</div>
         <div style="font-size:0.72rem;color:#64748b;font-weight:500;">Natural Power of Energy</div>
       </div>
     </div>
+    <div style="font-size:0.70rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;padding:0 6px 8px;">menu</div>
     """, unsafe_allow_html=True)
-    st.info("💡 **Navigation:** Use the horizontal tabs across the top of the dashboard for full-width layout.")
-    st.markdown("<hr>", unsafe_allow_html=True)
+
+    page = st.radio("menu", [
+        "🏠 Dashboard & System Overview",
+        "⚡ Demand Prediction & What-If",
+        "🔮 Future Demand Forecasting",
+        "📊 Historical Data Explorer",
+        "🎯 Model Performance & Metrics",
+        "🏔️ Peak Demand Analysis",
+        "📖 About & Methodology",
+    ], index=0, label_visibility="collapsed")
+
+    st.markdown("<hr style='margin:16px 0 12px 0;'>", unsafe_allow_html=True)
     st.markdown("**🤖 AI Models Status**")
     lr_ok = is_model_available("linear_regression")
     rf_ok = is_model_available("random_forest")
@@ -1603,36 +1639,25 @@ def page_about():
           • Captures non-linear meteorological and humidity interactions across normal load tiers.</p>
         </div>""", unsafe_allow_html=True)
 
-# ── Top Dashboard Header & Horizontal Navigation Tabs ─────────────────────────
-render_dash_bar("Natural Power of Energy • Delhi State Grid Command Center")
-
-tab_home, tab_pred, tab_fc, tab_exp, tab_perf, tab_peaks, tab_about = st.tabs([
-    "🏠 Dashboard Overview",
-    "⚡ Demand Prediction & What-If",
-    "🔮 Future Demand Forecasting",
-    "📊 Historical Data Explorer",
-    "🎯 Model Performance & Metrics",
-    "🏔️ Peak Demand Analysis",
-    "📖 About & Methodology",
-])
-
-with tab_home:
+# ── Main Content Router ───────────────────────────────────────────────────────
+if page.startswith("🏠"):
+    render_dash_bar("Natural Power of Energy • Delhi State Grid Command Center")
     page_home(history)
-
-with tab_pred:
+elif page.startswith("⚡"):
+    render_dash_bar("AI Electricity Demand Prediction & What-If Simulator")
     page_prediction(history)
-
-with tab_fc:
+elif page.startswith("🔮"):
+    render_dash_bar("Recursive Multi-Step Forward Forecasting Engine")
     page_forecast(history)
-
-with tab_exp:
+elif page.startswith("📊"):
+    render_dash_bar("Historical Load Profiles, Diurnal Curves & Telemetry")
     page_explorer(history)
-
-with tab_perf:
+elif page.startswith("🎯"):
+    render_dash_bar("Hold-Out Test Benchmark (70,825 Intervals • March–Dec 2024)")
     page_performance()
-
-with tab_peaks:
+elif page.startswith("🏔️"):
+    render_dash_bar("Historical Highs, Heatwaves & Substation Capacity Margins")
     page_peaks(history)
-
-with tab_about:
+else:
+    render_dash_bar("System Architecture, Causal Modeling & Zero Data Leakage Standards")
     page_about()
