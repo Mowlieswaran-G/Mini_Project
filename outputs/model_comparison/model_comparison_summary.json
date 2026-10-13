@@ -15,6 +15,13 @@
       "Test R\u00b2": 0.9983,
       "Training Time (s)": 140.85,
       "Prediction Time (s)": 1.02
+    },
+    "LSTM Neural Network": {
+      "Test MAE (MW)": 27.63,
+      "Test RMSE (MW)": 47.77,
+      "Test R\u00b2": 0.9987,
+      "Training Time (s)": 133.33,
+      "Prediction Time (s)": 1.71
     }
   },
   "peak_comparison": {
@@ -25,7 +32,10 @@
     "linear_regression_error_pct": -0.82,
     "random_forest_pred_mw": 7677.32,
     "random_forest_error_mw": -954.21,
-    "random_forest_error_pct": -11.05
+    "random_forest_error_pct": -11.05,
+    "lstm_pred_mw": 8179.67,
+    "lstm_error_mw": -451.86,
+    "lstm_error_pct": -5.23
   },
   "regime_analysis": {
     "normal_demand": {
@@ -33,28 +43,32 @@
       "observation_count": 53119,
       "percentage_of_test_set": 75.0,
       "linear_regression_mae_mw": 23.97,
-      "random_forest_mae_mw": 23.65
+      "random_forest_mae_mw": 23.65,
+      "lstm_mae_mw": 23.99
     },
     "high_demand": {
       "definition": "Actual demand between 75th and 95th percentile (5589.38 to 6905.92 MW)",
       "observation_count": 14164,
       "percentage_of_test_set": 20.0,
       "linear_regression_mae_mw": 28.67,
-      "random_forest_mae_mw": 31.35
+      "random_forest_mae_mw": 31.35,
+      "lstm_mae_mw": 31.77
     },
     "extreme_peak_demand": {
       "definition": "Actual demand > 95th percentile (> 6905.92 MW)",
       "observation_count": 3542,
       "percentage_of_test_set": 5.0,
       "linear_regression_mae_mw": 30.58,
-      "random_forest_mae_mw": 83.13
+      "random_forest_mae_mw": 83.13,
+      "lstm_mae_mw": 65.65
     },
     "top_1pct_super_extreme_peak": {
       "definition": "Actual demand > 99th percentile (> 7654.84 MW)",
       "observation_count": 709,
       "percentage_of_test_set": 1.0,
       "linear_regression_mae_mw": 27.78,
-      "random_forest_mae_mw": 243.52
+      "random_forest_mae_mw": 243.52,
+      "lstm_mae_mw": 134.93
     }
   }
 }

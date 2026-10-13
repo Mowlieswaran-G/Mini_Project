@@ -1,0 +1,52 @@
+# Git
+.git
+.gitignore
+
+# Python cache & virtual environments
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE & Editor artifacts
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testing & Logs
+.pytest_cache/
+.coverage
+htmlcov/
+*.log
+.system_generated/
+browser/
+
+# Large raw training datasets not used by the web app
+powerdemand_5min_2021_to_2024_with weather.csv
+feature_engineered_delhi_powerdemand_5min_2021_to_2024.csv
+train_delhi_powerdemand.csv
+test_delhi_powerdemand.csv
+load_data.csv
