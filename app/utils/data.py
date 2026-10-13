@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
 
 import joblib
 import pandas as pd
@@ -11,6 +12,20 @@ import streamlit as st
 
 
 ROOT = Path(__file__).resolve().parents[2]
+APP_DIR = Path(__file__).resolve().parents[1]
+
+# Ensure both project root and app dir are in sys.path
+for p in (str(ROOT), str(APP_DIR)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+# Pre-register lstm_model in sys.modules so joblib unpickler never fails
+try:
+    import lstm_model
+    sys.modules["lstm_model"] = lstm_model
+except ImportError:
+    pass
+
 DATA_FILE = ROOT / "cleaned_delhi_powerdemand_5min_2021_to_2024.csv"
 
 
@@ -28,13 +43,13 @@ def is_model_available(name: str) -> bool:
     return find_model(name) is not None
 
 
-@st.cache_data(show_spinner="Loading cleaned demand data...")
+@st.cache_resource(show_spinner="⚡ Power Predict AI: Loading Delhi Grid Telemetry...")
 def load_history() -> pd.DataFrame:
     df = pd.read_csv(DATA_FILE, parse_dates=["datetime"])
     return df.sort_values("datetime").drop_duplicates("datetime").reset_index(drop=True)
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def load_predictions(model_key: str) -> pd.DataFrame:
     path = ROOT / f"{model_key}_test_predictions.csv"
     if not path.exists():
@@ -49,11 +64,17 @@ def load_json(path: str) -> dict:
         return json.load(file)
 
 
-@st.cache_resource(show_spinner="Loading saved model...")
+@st.cache_resource(show_spinner="⚡ Power Predict AI: Initializing Model Engine...")
 def load_model(model_key: str):
     path = find_model(model_key)
     if path is None:
         raise FileNotFoundError(f"Saved {model_key.replace('_', ' ').title()} model file was not found.")
+    if "lstm_model" not in sys.modules:
+        try:
+            import lstm_model
+            sys.modules["lstm_model"] = lstm_model
+        except ImportError:
+            pass
     return joblib.load(path)
 
 

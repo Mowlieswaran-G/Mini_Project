@@ -19,10 +19,13 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Layer cache: install python dependencies first
-COPY requirements.txt .
+# Layer 1: Install PyTorch CPU first (heavy AI engine permanently cached by Docker)
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+# Layer 2: Install application requirements (cached until requirements.txt changes)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application and dataset files
 COPY . .

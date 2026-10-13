@@ -1,0 +1,38 @@
+{
+  "model": "LSTM Recurrent Neural Network (hidden_dim=64, num_layers=2, seq_len=6)",
+  "train_rows": 283298,
+  "test_rows": 70825,
+  "input_features_count": 17,
+  "timing": {
+    "training_time_seconds": 133.33,
+    "prediction_time_seconds": 1.71
+  },
+  "train_metrics": {
+    "MAE": 22.89,
+    "RMSE": 39.78,
+    "R2": 0.9989
+  },
+  "test_metrics": {
+    "MAE": 27.63,
+    "RMSE": 47.77,
+    "R2": 0.9987
+  },
+  "test_demand_actual_min": 1519.9,
+  "test_demand_actual_max": 8631.53,
+  "test_demand_predicted_min": 1481.83,
+  "test_demand_predicted_max": 8213.13,
+  "peak_observation": {
+    "datetime": "2024-06-19 15:05:00",
+    "actual_demand": 8631.53,
+    "predicted_demand": 8179.67,
+    "prediction_error_mw": -451.86,
+    "percentage_error": -5.23
+  },
+  "regime_mae": {
+    "Normal (<= 5589 MW)": 23.99,
+    "High (5589 - 6906 MW)": 31.78,
+    "Extreme (> 6906 MW)": 65.64,
+    "Super Extreme (> 7655 MW)": 135.05
+  },
+  "execution_status": "Success - Zero Errors"
+}

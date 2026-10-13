@@ -1,9 +1,9 @@
 """
 AI-Based Electricity Demand Projection — Delhi Power System
-NowEnergy Aesthetic Replica | Stage 11 Interactive Web Application
+Power Predict AI | Stage 11 Delhi Power Demand Web Application
 """
 from __future__ import annotations
-import importlib, sys
+import sys
 from datetime import date, datetime, time
 from pathlib import Path
 
@@ -14,12 +14,18 @@ import plotly.graph_objects as go
 import streamlit as st
 
 APP_DIR = Path(__file__).resolve().parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+ROOT_DIR = APP_DIR.parent
+for p in (str(ROOT_DIR), str(APP_DIR)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+try:
+    import lstm_model
+    sys.modules["lstm_model"] = lstm_model
+except ImportError:
+    pass
 
 import utils.data, utils.features
-importlib.reload(utils.data)
-importlib.reload(utils.features)
 
 from utils.data import (ROOT, find_model, is_model_available,
                         load_history, load_json, load_model, load_predictions)
@@ -55,7 +61,7 @@ from utils.features import (FEATURE_COLUMNS, FEATURE_INFO, LAGS, SCENARIO_PRESET
                              make_custom_feature_row, make_feature_row)
 
 # ── Page config ──────────────────────────────────────────────────────────────
-st.set_page_config(page_title="NowEnergy | Delhi Power AI",
+st.set_page_config(page_title="Power Predict AI | Delhi Demand Forecasting",
                    page_icon="⚡", layout="wide",
                    initial_sidebar_state="expanded")
 
@@ -64,18 +70,15 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
-/* Sage-green outer canvas from the reference image */
+/* Deep Midnight Slate outer canvas from the reference image */
 html, body {
-    background-color: #3b876a !important;
+    background-color: #0f172a !important;
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif !important;
 }
 
-/* App Container: True side-by-side flexbox layout so sidebar NEVER overlaps the main page */
-[data-testid="stAppViewContainer"] {
-    display: flex !important;
-    flex-direction: row !important;
-    background-color: #3b876a !important;
-}
+/* Keep Streamlit's native layout mechanics: they reserve main-content space on
+   desktop and power the sidebar hide/show button. */
+[data-testid="stAppViewContainer"] { background-color: #0f172a !important; }
 
 /* Prevent Streamlit top bar from overlapping page content */
 header[data-testid="stHeader"] {
@@ -84,17 +87,12 @@ header[data-testid="stHeader"] {
     height: 48px !important;
 }
 
-/* Floating White Sidebar: Fixed width in flex flow, natural left positioning, no overlapping */
+/* Floating White Sidebar. Do not override position/transform: Streamlit uses
+   those properties to animate and operate its built-in hide button. */
 section[data-testid="stSidebar"] {
-    background-color: #3b876a !important;
+    background-color: #0f172a !important;
     border-right: none !important;
-    position: relative !important;
-    flex: 0 0 270px !important;
-    width: 270px !important;
-    min-width: 270px !important;
-    max-width: 270px !important;
     z-index: 20 !important;
-    transform: none !important;
 }
 
 section[data-testid="stSidebar"] > div:first-child {
@@ -105,15 +103,24 @@ section[data-testid="stSidebar"] > div:first-child {
     box-shadow: 0 10px 32px rgba(0,0,0,0.12) !important;
     height: calc(100vh - 32px) !important;
     overflow-y: auto !important;
+    box-sizing: border-box !important;
+    max-width: calc(100% - 20px) !important;
+    overflow-x: hidden !important;
 }
 
-/* Main Content Area: fills remaining space side-by-side with zero overlap */
+/* Main Content Area */
 [data-testid="stMain"] {
-    flex: 1 1 0% !important;
-    min-width: 0 !important;
-    background-color: #3b876a !important;
+    background-color: #0f172a !important;
     overflow-x: hidden !important;
-    position: relative !important;
+}
+
+/* Keep the native collapse controls visible above the floating cards. */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 1001 !important;
 }
 
 /* Floating White Canvas for Dashboard with clean margins and no clipping */
@@ -124,6 +131,22 @@ section[data-testid="stSidebar"] > div:first-child {
     margin: 12px 14px 20px 6px !important;
     max-width: calc(100% - 20px) !important;
     box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+/* Keep every card and text block inside its measured boundary. */
+.ne-box, .ne-kpi-card, .ne-energy-mode-card,
+[data-testid="stMarkdownContainer"], [data-testid="stPlotlyChart"] {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+.ne-box-title, .stMarkdown p, .stMarkdown li,
+[data-testid="stWidgetLabel"], [data-testid="stWidgetLabel"] label {
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
 }
 
 /* Typography & Base Text */
@@ -147,6 +170,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
     gap: 4px !important;
+    width: 100% !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] label {
     padding: 10px 14px !important;
@@ -161,10 +185,47 @@ h1, h2, h3, h4, h5, h6 {
     display: flex !important;
     align-items: center !important;
     width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+/* Streamlit/BaseWeb versions use either an input or a role=radio element for
+   the default indicator.  Remove its reserved column in both cases. */
+[data-testid="stSidebar"] [data-testid="stRadio"] input[type="radio"] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radio"] {
+    display: none !important;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] label > div:last-child,
+[data-testid="stSidebar"] [data-testid="stRadio"] label span {
+    min-width: 0 !important;
+}
+
+/* Plotly's toolbar overlaps legends at narrow widths. Hide the redundant
+   floating toolbar and let each chart use the width of its container. */
+[data-testid="stPlotlyChart"] .modebar {
+    display: none !important;
+}
+[data-testid="stPlotlyChart"] {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+@media (max-width: 900px) {
+    .block-container {
+        padding: 18px !important;
+        margin: 8px !important;
+        border-radius: 16px !important;
+    }
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] label:hover {
-    background: #eef9f2 !important;
-    color: #15803d !important;
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
 }
 [data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
     background: #32996e !important;
@@ -236,11 +297,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 .ne-kpi-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(50, 153, 110, 0.1);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.15);
     border-color: #cbd5e1;
 }
 .ne-kpi-pill {
-    background: #32996e;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
     color: #ffffff !important;
     border-radius: 8px;
     padding: 6px 8px;
@@ -295,6 +356,8 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 8px;
     margin-bottom: 14px;
+    flex-wrap: wrap;
+    line-height: 1.35;
 }
 
 /* Energy Mode Orange Gradient Card */
@@ -426,35 +489,35 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Callout */
 .cb {
-    background: #f0fdf4 !important;
-    border-left: 4px solid #32996e !important;
+    background: #eff6ff !important;
+    border-left: 4px solid #2563eb !important;
     border-radius: 0 10px 10px 0 !important;
     padding: 13px 17px !important;
     margin-bottom: 18px !important;
-    color: #166534 !important;
+    color: #1e3a8a !important;
     font-size: 0.90rem !important;
     line-height: 1.6 !important;
 }
 .cb b {
-    color: #14532d !important;
+    color: #1e3a8a !important;
 }
 
 /* Buttons */
 [data-testid="stButton"] > button {
-    background: linear-gradient(135deg, #32996e, #22c55e) !important;
+    background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
     color: #ffffff !important;
     border: none !important;
     border-radius: 12px !important;
     font-weight: 700 !important;
     font-size: 0.96rem !important;
     padding: 12px 26px !important;
-    box-shadow: 0 4px 14px rgba(50, 153, 110, 0.3) !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
     transition: all 0.2s ease !important;
 }
 [data-testid="stButton"] > button:hover {
     transform: translateY(-1px) !important;
-    box-shadow: 0 8px 22px rgba(50, 153, 110, 0.4) !important;
-    background: linear-gradient(135deg, #28805c, #16a34a) !important;
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45) !important;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
 }
 [data-testid="stButton"] > button * {
     color: #ffffff !important;
@@ -462,17 +525,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 [data-testid="stDownloadButton"] > button {
     background: #ffffff !important;
-    color: #32996e !important;
-    border: 1.5px solid #32996e !important;
+    color: #2563eb !important;
+    border: 1.5px solid #2563eb !important;
     border-radius: 12px !important;
     font-weight: 700 !important;
     padding: 10px 20px !important;
 }
 [data-testid="stDownloadButton"] > button:hover {
-    background: #eef9f2 !important;
+    background: #eff6ff !important;
 }
 [data-testid="stDownloadButton"] > button * {
-    color: #32996e !important;
+    color: #2563eb !important;
 }
 
 /* Model Cards & Step Cards */
@@ -516,7 +579,7 @@ h1, h2, h3, h4, h5, h6 {
 .sc:hover {
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 18px rgba(50, 153, 110, 0.12) !important;
-    border-color: #86efac !important;
+    border-color: #93c5fd !important;
 }
 .sc .si {
     font-size: 1.9rem !important;
@@ -526,7 +589,7 @@ h1, h2, h3, h4, h5, h6 {
 .sc h4 {
     font-size: 0.98rem !important;
     font-weight: 700 !important;
-    color: #14532d !important;
+    color: #1e3a8a !important;
     margin: 0 0 6px !important;
 }
 .sc p {
@@ -544,7 +607,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 12px 16px !important;
 }
 [data-testid="stMetricValue"] {
-    color: #15803d !important;
+    color: #1d4ed8 !important;
     font-weight: 800 !important;
     font-family: 'JetBrains Mono', monospace !important;
 }
@@ -577,15 +640,15 @@ h1, h2, h3, h4, h5, h6 {
     white-space: nowrap !important;
 }
 [data-testid="stTabs"] [role="tab"]:hover {
-    background: #eef9f2 !important;
-    color: #15803d !important;
-    border-color: #86efac !important;
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    border-color: #93c5fd !important;
 }
 [data-testid="stTabs"] [role="tab"][aria-selected="true"] {
     background: #32996e !important;
     color: #ffffff !important;
     font-weight: 700 !important;
-    border-color: #32996e !important;
+    border-color: #2563eb !important;
     box-shadow: 0 4px 14px rgba(50, 153, 110, 0.28) !important;
 }
 [data-testid="stTabs"] [role="tab"][aria-selected="true"] * {
@@ -609,8 +672,8 @@ h1, h2, h3, h4, h5, h6 {
 [data-testid="stNumberInput"] input:focus, 
 [data-testid="stDateInput"] input:focus,
 [data-testid="stTimeInput"] input:focus {
-    border-color: #32996e !important;
-    box-shadow: 0 0 0 2px rgba(50, 153, 110, 0.2) !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2) !important;
 }
 [data-testid="stSelectbox"] > div > div {
     background-color: #ffffff !important;
@@ -621,15 +684,15 @@ h1, h2, h3, h4, h5, h6 {
 .st2 {
     font-size: 1.1rem !important;
     font-weight: 700 !important;
-    color: #14532d !important;
-    border-left: 4px solid #32996e !important;
+    color: #1e3a8a !important;
+    border-left: 4px solid #2563eb !important;
     padding-left: 10px !important;
     margin: 20px 0 14px !important;
 }
 .fg {
     font-size: 0.90rem !important;
     font-weight: 700 !important;
-    color: #15803d !important;
+    color: #1d4ed8 !important;
     margin-bottom: 8px !important;
     padding-bottom: 6px !important;
     border-bottom: 2px solid #bbf7d0 !important;
@@ -638,20 +701,112 @@ hr {
     border-color: #f1f5f9 !important;
     margin: 20px 0 !important;
 }
+
+/* ── Power Predict AI Loading & Dynamic Electricity Animations ── */
+@keyframes lightningArc {
+    0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 3px #10b981); transform: scale(1); }
+    30% { opacity: 1; filter: drop-shadow(0 0 10px #fbbf24) brightness(1.3); transform: scale(1.15) rotate(-3deg); }
+    60% { opacity: 0.75; filter: drop-shadow(0 0 5px #34d399); transform: scale(0.95); }
+    85% { opacity: 1; filter: drop-shadow(0 0 12px #f59e0b) brightness(1.35); transform: scale(1.18) rotate(3deg); }
+}
+
+@keyframes electricPulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(37, 99, 235, 0.4), 0 0 16px rgba(245, 158, 11, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 22px rgba(16, 185, 129, 0.85), 0 0 32px rgba(245, 158, 11, 0.5);
+    }
+}
+
+@keyframes energyBeamSweep {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes powerSurgeBorder {
+    0% { border-color: #2563eb; }
+    50% { border-color: #38bdf8; }
+    100% { border-color: #2563eb; }
+}
+
+/* Streamlit Header Running Indicator -> High-Tech Power Grid Status Pill */
+[data-testid="stStatusWidget"] {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 58, 138, 0.95)) !important;
+    border: 1.5px solid #38bdf8 !important;
+    border-radius: 9999px !important;
+    padding: 6px 14px !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4), 0 0 15px rgba(251, 191, 36, 0.3) !important;
+    animation: electricPulseGlow 1.8s infinite ease-in-out, powerSurgeBorder 2.5s infinite ease-in-out !important;
+    backdrop-filter: blur(10px) !important;
+}
+[data-testid="stStatusWidget"] svg, [data-testid="stStatusWidget"] i {
+    color: #fbbf24 !important;
+    animation: lightningArc 1s infinite alternate !important;
+    filter: drop-shadow(0 0 6px #fbbf24) !important;
+}
+[data-testid="stStatusWidget"] span {
+    color: #ecfdf5 !important;
+    font-weight: 700 !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Streamlit Spinner Component -> Futuristic Electric Power Reactor */
+[data-testid="stSpinner"] {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e1b4b 100%) !important;
+    border: 1.5px solid #38bdf8 !important;
+    border-radius: 14px !important;
+    padding: 16px 20px !important;
+    margin: 12px 0 18px 0 !important;
+    box-shadow: 0 8px 24px rgba(6, 78, 59, 0.35), 0 0 20px rgba(99, 102, 241, 0.3) !important;
+    animation: electricPulseGlow 2s infinite ease-in-out !important;
+}
+[data-testid="stSpinner"] > div {
+    color: #ecfdf5 !important;
+    font-weight: 700 !important;
+    font-size: 0.92rem !important;
+    letter-spacing: 0.3px !important;
+}
+[data-testid="stSpinner"] i, [data-testid="stSpinner"] svg {
+    color: #fbbf24 !important;
+    width: 24px !important;
+    height: 24px !important;
+    filter: drop-shadow(0 0 8px #fbbf24) !important;
+    animation: lightningArc 0.9s infinite alternate !important;
+}
+
+/* Tab active state power pulse */
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) {
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4), 0 0 12px rgba(99, 102, 241, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked)::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: energyBeamSweep 2.4s infinite ease-in-out;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ── Chart Themes & Helpers ───────────────────────────────────────────────────
-PALETTE = ["#32996e", "#f97316", "#10b981", "#fb923c", "#059669", "#ea580c"]
+PALETTE = ["#2563eb", "#f97316", "#06b6d4", "#8b5cf6", "#ec4899", "#f59e0b"]
 
 def _wl(fig, title, h=390):
     fig.update_layout(
-        title=dict(text=f"<b>{title}</b>", font=dict(size=14, color="#14532d")),
+        title=dict(text=f"<b>{title}</b>", x=0, y=0.98, xanchor="left", yanchor="top",
+                   font=dict(size=14, color="#1e3a8a")),
         paper_bgcolor="#ffffff", plot_bgcolor="#fafcfb",
         font=dict(family="Plus Jakarta Sans, sans-serif", color="#0f172a"),
         xaxis=dict(gridcolor="#f1f5f9", linecolor="#e2e8f0", title_font=dict(color="#475569")),
         yaxis=dict(gridcolor="#f1f5f9", linecolor="#e2e8f0", title_font=dict(color="#475569")),
-        height=h, margin=dict(l=14, r=14, t=44, b=14),
+        height=h, margin=dict(l=14, r=14, t=78, b=22),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1,
                     font=dict(color="#0f172a"))
     )
@@ -684,18 +839,22 @@ def nowenergy_combo_chart(frame, title="Energy Usage"):
             x=frame["datetime"], y=frame["temp"],
             name="Temperature (°C)", yaxis="y2",
             mode="lines+markers",
-            line=dict(color="#32996e", width=2.8, shape="spline"),
-            marker=dict(size=4.5, color="#32996e", line=dict(color="#ffffff", width=1))
+            line=dict(color="#0284c7", width=2.8, shape="spline"),
+            marker=dict(size=4.5, color="#0284c7", line=dict(color="#ffffff", width=1))
         ))
     fig.update_layout(
-        title=dict(text=f"<b>{title}</b>", font=dict(size=14, color="#14532d")),
+        title=dict(text=f"<b>{title}</b>", x=0, y=0.98, xanchor="left", yanchor="top",
+                   font=dict(size=14, color="#1e3a8a")),
         paper_bgcolor="#ffffff", plot_bgcolor="#fafcfb",
         font=dict(family="Plus Jakarta Sans, sans-serif", color="#0f172a"),
         xaxis=dict(gridcolor="#f1f5f9", linecolor="#e2e8f0"),
         yaxis=dict(title="Energy (MW)", gridcolor="#f1f5f9", linecolor="#e2e8f0"),
         yaxis2=dict(title="Temperature (°C)", overlaying="y", side="right", showgrid=False),
-        height=350, margin=dict(l=14, r=14, t=44, b=14),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        height=350, margin=dict(l=14, r=14, t=84, b=22),
+        legend=dict(
+            orientation="h", yanchor="bottom", y=1.02,
+            xanchor="right", x=1, font=dict(size=11)
+        )
     )
     return fig
 
@@ -708,7 +867,7 @@ def nowenergy_donut_chart(main_val=236, green_val=90, title_total="Total: 336 MW
         hole=0.68,
         sort=False,
         direction="clockwise",
-        marker=dict(colors=["#f97316", "#32996e"], line=dict(color="#ffffff", width=2.5)),
+        marker=dict(colors=["#f97316", "#2563eb"], line=dict(color="#ffffff", width=2.5)),
         textinfo="percent",
         textfont=dict(color="#ffffff", size=12, family="Plus Jakarta Sans"),
         hoverinfo="label+value+percent"
@@ -735,7 +894,7 @@ def nowenergy_capacity_gauge(mw):
         hole=0.74,
         sort=False,
         direction="clockwise",
-        marker=dict(colors=["#32996e", "#f1f5f9"], line=dict(color="#ffffff", width=2)),
+        marker=dict(colors=["#2563eb", "#e2e8f0"], line=dict(color="#ffffff", width=2)),
         textinfo="none",
         hoverinfo="none"
     ))
@@ -759,10 +918,10 @@ def nowenergy_area_carbon(frame, title="Carbon Footprint CO2"):
     fig.add_trace(go.Scatter(
         x=frame["datetime"], y=frame["Power demand"],
         mode="lines+markers",
-        line=dict(color="#32996e", width=2.5, shape="spline"),
-        marker=dict(size=5, color="#32996e", line=dict(color="#ffffff", width=1.5)),
+        line=dict(color="#2563eb", width=2.5, shape="spline"),
+        marker=dict(size=5, color="#2563eb", line=dict(color="#ffffff", width=1.5)),
         fill="tozeroy",
-        fillcolor="rgba(50, 153, 110, 0.15)",
+        fillcolor="rgba(37, 99, 235, 0.15)",
         name="Demand Trajectory"
     ))
     return _wl(fig, title, h=280)
@@ -806,11 +965,11 @@ def render_dash_bar(subtitle="Delhi State Grid Command Center"):
     st.markdown(f"""
     <div class="ne-dash-bar">
       <div class="ne-dash-title">
-        <span>📊</span> Dashboard
+        <span style="display:inline-block;animation:lightningArc 1.2s infinite alternate;">⚡</span> Power Predict AI
         <span style="font-size:0.75rem;font-weight:500;color:#64748b;margin-left:8px;">{subtitle}</span>
       </div>
       <div class="ne-dash-user">
-        <span class="ne-user-dot">AH</span> Akhsan Habib &nbsp; <b>⋮</b>
+        <span class="ne-user-dot" style="background:#10b981;color:#ffffff;">⚡</span> Grid Core Active &nbsp; <b>⋮</b>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -821,11 +980,11 @@ with st.sidebar:
     <div style="display:flex;align-items:center;gap:12px;padding:4px 6px 14px;">
       <div style="width:38px;height:38px;background:#32996e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:1.2rem;box-shadow:0 4px 10px rgba(50,153,110,0.3);">⚡</div>
       <div>
-        <div style="font-size:1.15rem;font-weight:800;color:#0f172a;line-height:1.1;">NowEnergy</div>
-        <div style="font-size:0.72rem;color:#64748b;font-weight:500;">Natural Power of Energy</div>
+        <div style="font-size:1.16rem;font-weight:800;color:#0f172a;line-height:1.1;letter-spacing:-0.4px;">Power Predict AI</div>
+        <div style="font-size:0.72rem;color:#10b981;font-weight:700;letter-spacing:0.3px;">INTELLIGENT GRID DISPATCH</div>
       </div>
     </div>
-    <div style="font-size:0.70rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;padding:0 6px 8px;">menu</div>
+    <div style="font-size:0.70rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;padding:0 6px 8px;">navigation tabs</div>
     """, unsafe_allow_html=True)
 
     page = st.radio("menu", [
@@ -842,9 +1001,11 @@ with st.sidebar:
     st.markdown("**🤖 AI Models Status**")
     lr_ok = is_model_available("linear_regression")
     rf_ok = is_model_available("random_forest")
-    a, b2 = st.columns(2)
+    lstm_ok = is_model_available("lstm")
+    a, b2, c_ls = st.columns(3)
     a.markdown(f"Linear Reg.<br>{'✅ Ready' if lr_ok else '❌ Missing'}", unsafe_allow_html=True)
     b2.markdown(f"Random Forest<br>{'✅ Ready' if rf_ok else '❌ Missing'}", unsafe_allow_html=True)
+    c_ls.markdown(f"LSTM Net<br>{'✅ Ready' if lstm_ok else '❌ Missing'}", unsafe_allow_html=True)
     st.caption("Delhi State SLDC Grid • 2021–2024")
 
 # ── Page 1: Demand Prediction & What-If ───────────────────────────────────────
@@ -889,9 +1050,16 @@ def page_prediction(dfh):
 
     c1, c2 = st.columns([1, 2])
     with c1:
-        model_choice = st.selectbox("🤖 Primary Forecasting Model",
-                                    ["Linear Regression", "Random Forest"])
-        pkey = "linear_regression" if model_choice == "Linear Regression" else "random_forest"
+        m_opts = ["Linear Regression", "Random Forest"]
+        if is_model_available("lstm"):
+            m_opts.append("LSTM Neural Network")
+        model_choice = st.selectbox("🤖 Primary Forecasting Model", m_opts)
+        if model_choice == "Linear Regression":
+            pkey = "linear_regression"
+        elif model_choice == "Random Forest":
+            pkey = "random_forest"
+        else:
+            pkey = "lstm"
     with c2:
         mode = st.radio("📥 Data Input Mode", [
             "🎛️ Interactive Scenario Builder (What-If Analysis)",
@@ -1015,16 +1183,23 @@ def page_prediction(dfh):
         st.markdown("<div style='padding-top:8px;font-size:0.84rem;color:#64748b;'>⚡ Executes dual-model inference (Linear Regression & Random Forest) in <b>< 10ms</b>.</div>", unsafe_allow_html=True)
 
     fdf = make_custom_feature_row(feats)
-    pl, pr = None, None
+    pl, pr, plstm = None, None, None
     try:
         if is_model_available("linear_regression"):
             pl = predict_features("linear_regression", fdf)
         if is_model_available("random_forest"):
             pr = predict_features("random_forest", fdf)
+        if is_model_available("lstm"):
+            plstm = predict_features("lstm", fdf)
     except Exception as e:
         st.error(f"Inference error: {e}"); return
 
-    pp = pl if pkey == "linear_regression" else (pr or pl)
+    if pkey == "linear_regression":
+        pp = pl
+    elif pkey == "random_forest":
+        pp = pr or pl
+    else:
+        pp = plstm or pl
     if pp is None:
         st.warning("No model .pkl file found."); return
 
@@ -1046,7 +1221,7 @@ def page_prediction(dfh):
     <div class="ne-result-banner">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
         <div>
-          <div class="ne-rb-label">⚡ AI Forecast Output — {model_choice}</div>
+          <div class="ne-rb-label">⚡ Power Predict AI Forecast — {model_choice}</div>
           <div class="ne-rb-val">{pp:,.2f} <span>MW</span></div>
           <div class="ne-rb-sub">= <b>{pp/1000:.3f} GW</b> of active electrical demand</div>
         </div>
@@ -1068,23 +1243,29 @@ def page_prediction(dfh):
     left_col, right_col = st.columns([1.75, 1.0])
 
     with left_col:
-        st.markdown('<div class="st2" style="margin-top:0">🤖 Dual-Model Projection Comparison</div>', unsafe_allow_html=True)
-        m1, m2 = st.columns(2)
-        with m1:
+        st.markdown('<div class="st2" style="margin-top:0">🤖 Multi-Model Projection Comparison</div>', unsafe_allow_html=True)
+        col_cards = st.columns(3 if plstm is not None else 2)
+        with col_cards[0]:
             lv = f"{pl:,.1f} MW" if pl is not None else "Unavailable"
-            st.markdown(f'<div class="mc"><span class="mv" style="color:#32996e">{lv}</span>' +
+            st.markdown(f'<div class="mc"><span class="mv" style="color:#2563eb">{lv}</span>' +
                         '<span class="ml">Predicted Demand</span>' +
                         '<span class="mm">Linear Regression (Baseline)</span></div>', unsafe_allow_html=True)
-        with m2:
+        with col_cards[1]:
             rv2 = f"{pr:,.1f} MW" if pr is not None else "Unavailable"
             rc = "#f97316" if pr is not None else "#9ca3af"
             st.markdown(f'<div class="mc"><span class="mv" style="color:{rc}">{rv2}</span>' +
                         '<span class="ml">Predicted Demand</span>' +
                         '<span class="mm">Random Forest (100 Trees)</span></div>', unsafe_allow_html=True)
+        if plstm is not None:
+            with col_cards[2]:
+                st.markdown(f'<div class="mc"><span class="mv" style="color:#7c3aed">{plstm:,.1f} MW</span>' +
+                            '<span class="ml">Predicted Demand</span>' +
+                            '<span class="mm">PyTorch LSTM (Deep RNN)</span></div>', unsafe_allow_html=True)
 
         if pl is not None and pr is not None:
             diff = pr - pl; dpct = (diff / pl) * 100
-            st.info(f"📊 **Model Divergence:** Random Forest projects **{diff:+,.1f} MW ({dpct:+.2f}%)** relative to Linear Regression.")
+            diff_lstm = f" | LSTM vs LR: **{plstm - pl:+,.1f} MW**" if plstm is not None else ""
+            st.info(f"📊 **Model Divergence:** Random Forest projects **{diff:+,.1f} MW ({dpct:+.2f}%)** relative to Linear Regression{diff_lstm}.")
 
         if actual is not None:
             em = pp - actual; ep = (em / actual) * 100; ap = max(0.0, 100.0 - abs(ep))
@@ -1227,7 +1408,7 @@ def page_home(dfh):
 
     # 4 Pipeline Cards
     st.markdown("<hr>", unsafe_allow_html=True)
-    st.markdown('<div class="st2">🛠️ Delhi AI Forecasting Pipeline</div>', unsafe_allow_html=True)
+    st.markdown('<div class="st2">🛠️ Power Predict AI Forecasting Pipeline</div>', unsafe_allow_html=True)
     steps = [("🧹", "1. Data Cleaning", "Merged 5-minute telemetry with atmospheric weather; irregular gaps cleaned."),
              ("⚙️", "2. Causal Lags", "17 strictly causal features: 7 temporal, 4 exact timestamp lags, 6 weather."),
              ("🤖", "3. Dual AI Models", "Linear Regression + 100-tree Random Forest on chronological 80/20 split."),
@@ -1243,7 +1424,9 @@ def page_explorer(dfh):
     mn, mx = dfh.datetime.min().date(), dfh.datetime.max().date()
     dates = st.date_input("📅 Date Range Selection", value=(date(2024, 6, 1), date(2024, 6, 30)), min_value=mn, max_value=mx)
     if len(dates) != 2: st.info("Please select both start and end dates."); return
-    sel = dfh[dfh.datetime.dt.date.between(*dates)]
+    st_ts = pd.Timestamp(dates[0])
+    end_ts = pd.Timestamp(dates[1]) + pd.Timedelta(days=1)
+    sel = dfh[(dfh["datetime"] >= st_ts) & (dfh["datetime"] < end_ts)]
     if sel.empty: st.warning("No records found in this range."); return
 
     st.markdown(f"""
@@ -1271,7 +1454,9 @@ def page_explorer(dfh):
     </div>
     """, unsafe_allow_html=True)
 
-    st.plotly_chart(nowenergy_combo_chart(sel, f"Demand & Temperature Profile — {dates[0]:%d %b %Y} to {dates[1]:%d %b %Y}"), use_container_width=True)
+    step = max(1, len(sel) // 1000)
+    chart_view = sel.iloc[::step] if step > 1 else sel
+    st.plotly_chart(nowenergy_combo_chart(chart_view, f"Demand & Temperature Profile — {dates[0]:%d %b %Y} to {dates[1]:%d %b %Y}"), use_container_width=True)
 
     c1, c2, c3 = st.columns(3)
     fh2 = px.bar(sel.groupby(sel.datetime.dt.hour)["Power demand"].mean().reset_index(name="D"),
@@ -1351,13 +1536,18 @@ def page_performance():
     pk2 = comp.get("peak_comparison", {})
     if pk2:
         st.markdown('<div class="st2">🔥 Performance at All-Time Historical Record Peak (2024-06-19 15:05)</div>', unsafe_allow_html=True)
-        p1, p2, p3, p4 = st.columns(4)
-        p1.metric("Actual Peak", f"{pk2.get('actual_demand_mw', 0.0):,.2f} MW")
-        p2.metric("LR Predicted", f"{pk2.get('linear_regression_pred_mw', 0.0):,.2f} MW",
+        p_cols = st.columns(5 if "lstm_pred_mw" in pk2 else 4)
+        p_cols[0].metric("Actual Peak", f"{pk2.get('actual_demand_mw', 0.0):,.2f} MW")
+        p_cols[1].metric("LR Predicted", f"{pk2.get('linear_regression_pred_mw', 0.0):,.2f} MW",
                   delta=f"{pk2.get('linear_regression_error_pct', 0.0):+.2f}%", delta_color="inverse")
-        p3.metric("RF Predicted", f"{pk2.get('random_forest_pred_mw', 0.0):,.2f} MW",
+        p_cols[2].metric("RF Predicted", f"{pk2.get('random_forest_pred_mw', 0.0):,.2f} MW",
                   delta=f"{pk2.get('random_forest_error_pct', 0.0):+.2f}%", delta_color="inverse")
-        p4.metric("Peak Timestamp", pk2.get("timestamp", "—"))
+        if "lstm_pred_mw" in pk2:
+            p_cols[3].metric("LSTM Predicted", f"{pk2.get('lstm_pred_mw', 0.0):,.2f} MW",
+                             delta=f"{pk2.get('lstm_error_pct', 0.0):+.2f}%", delta_color="inverse")
+            p_cols[4].metric("Peak Timestamp", pk2.get("timestamp", "—"))
+        else:
+            p_cols[3].metric("Peak Timestamp", pk2.get("timestamp", "—"))
 
     rd = comp.get("regime_analysis", {})
     if rd:
@@ -1368,21 +1558,30 @@ def page_performance():
             pct = ri.get("percentage_of_test_set", "?")
             lrmae = ri.get("linear_regression_mae_mw", 0)
             rfmae = ri.get("random_forest_mae_mw", 0)
-            rr.append({"Regime": rk.replace("_", " ").title(),
-                       "Definition": ri.get("definition", ""),
-                       "Observations": f"{obs:,} ({pct}%)",
-                       "LR MAE": f"{lrmae:.2f} MW",
-                       "RF MAE": f"{rfmae:.2f} MW"})
+            lstmmae = ri.get("lstm_mae_mw", None)
+            row_dict = {"Regime": rk.replace("_", " ").title(),
+                        "Definition": ri.get("definition", ""),
+                        "Observations": f"{obs:,} ({pct}%)",
+                        "LR MAE": f"{lrmae:.2f} MW",
+                        "RF MAE": f"{rfmae:.2f} MW"}
+            if lstmmae is not None:
+                row_dict["LSTM MAE"] = f"{lstmmae:.2f} MW"
+            rr.append(row_dict)
         st.dataframe(pd.DataFrame(rr), hide_index=True, use_container_width=True)
 
-    ms = st.selectbox("Inspect prediction residuals for:", ["linear_regression", "random_forest"])
-    pr2 = load_predictions(ms); pr2["residual"] = pr2.actual_demand - pr2.predicted_demand
+    avail_res = ["linear_regression", "random_forest"]
+    if is_model_available("lstm"):
+        avail_res.append("lstm")
+    ms = st.selectbox("Inspect prediction residuals for:", avail_res)
+    pr2 = load_predictions(ms)
+    res_series = pd.Series(pr2.actual_demand.to_numpy() - pr2.predicted_demand.to_numpy(), name="residual", index=pr2.index)
     st.plotly_chart(line_chart(pr2.iloc[1000:2500],
                                f"Actual vs Predicted — {ms.replace('_',' ').title()} (Zoomed Section)",
                                ["actual_demand", "predicted_demand"],
                                {"actual_demand": "Actual (MW)", "predicted_demand": "Predicted (MW)"}),
                     use_container_width=True)
-    fres = px.histogram(pr2, x="residual", nbins=100,
+    res_sample = res_series.sample(min(len(res_series), 12000), random_state=42)
+    fres = px.histogram(res_sample, x="residual", nbins=100,
                         title=f"<b>Residual Error Distribution — {ms.replace('_',' ').title()}</b>",
                         labels={"residual": "Error (Actual − Predicted MW)"},
                         color_discrete_sequence=["#32996e"])
@@ -1477,12 +1676,19 @@ def run_forecast(key, dfh, steps2):
     return run_fast_forecast(key, steps2)
 
 def page_forecast(dfh):
-    render_dash_bar("Recursive Multi-Step Forward Forecasting Engine")
     
     col_engine, col_hz = st.columns(2)
     with col_engine:
-        ch = st.selectbox("Forecasting Engine", ["Linear Regression (Recommended - Ultra Fast)", "Random Forest"])
-        k2 = "linear_regression" if "Linear" in ch else "random_forest"
+        fe_opts = ["Linear Regression (Recommended - Ultra Fast)", "Random Forest"]
+        if is_model_available("lstm"):
+            fe_opts.append("LSTM Neural Network (Deep RNN)")
+        ch = st.selectbox("Forecasting Engine", fe_opts)
+        if "Linear" in ch:
+            k2 = "linear_regression"
+        elif "Random" in ch:
+            k2 = "random_forest"
+        else:
+            k2 = "lstm"
     with col_hz:
         iv3 = dfh.datetime.diff().dropna().mode().iloc[0]
         hz = {"Next 24 Hours (288 steps)": int(pd.Timedelta(days=1) / iv3),
@@ -1548,7 +1754,6 @@ def page_forecast(dfh):
 
 # ── Page 6: Peak Demand Analysis ──────────────────────────────────────────────
 def page_peaks(dfh):
-    render_dash_bar("Historical Highs, Heatwaves & Substation Capacity Margins")
     pr3 = dfh.loc[dfh["Power demand"].idxmax()]
 
     st.markdown(f"""
@@ -1602,7 +1807,6 @@ def page_peaks(dfh):
 
 # ── Page 7: About & Methodology ───────────────────────────────────────────────
 def page_about():
-    render_dash_bar("System Architecture, Causal Modeling & Zero Data Leakage Standards")
     st.markdown('<div class="st2">📐 Complete 17 Input Feature Catalog</div>', unsafe_allow_html=True)
     rows2 = []
     for f in FEATURE_COLUMNS:

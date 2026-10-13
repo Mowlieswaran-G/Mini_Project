@@ -43,3 +43,10 @@ htmlcov/
 *.log
 .system_generated/
 browser/
+
+# Large raw training datasets not used by the web app
+powerdemand_5min_2021_to_2024_with weather.csv
+feature_engineered_delhi_powerdemand_5min_2021_to_2024.csv
+train_delhi_powerdemand.csv
+test_delhi_powerdemand.csv
+load_data.csv
