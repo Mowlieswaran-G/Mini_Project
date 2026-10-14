@@ -1,5 +1,5 @@
 """
-Chase | Delhi Power Grid AI Management Dashboard
+Power Predict AI | Delhi Power Grid Management Dashboard
 State Load Despatch Centre (SLDC) Electricity Demand Forecasting & Grid Operations Platform
 """
 
@@ -49,7 +49,7 @@ except ImportError:
 
 # ── Page Configuration ────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Chase | Delhi Power Grid Management",
+    page_title="Power Predict AI | Delhi Grid Forecasting",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -571,8 +571,8 @@ with st.sidebar:
         <circle cx="12" cy="12" r="4.5" fill="#4F46E5"/>
       </svg>
       <div>
-        <div style="font-size:1.20rem;font-weight:800;color:#1E293B;line-height:1.1;letter-spacing:-0.02em;">Chase</div>
-        <div style="font-size:0.70rem;color:#4F46E5;font-weight:700;letter-spacing:0.5px;">DELHI POWER SYSTEM</div>
+        <div style="font-size:1.15rem;font-weight:800;color:#1E293B;line-height:1.1;letter-spacing:-0.02em;">Power Predict AI</div>
+        <div style="font-size:0.70rem;color:#4F46E5;font-weight:700;letter-spacing:0.5px;">DELHI GRID FORECASTING</div>
       </div>
     </div>
     <div style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:1px;padding:0 8px 8px;">MENU</div>
