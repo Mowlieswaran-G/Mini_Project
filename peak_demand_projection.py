@@ -152,7 +152,7 @@ class PeakDemandProjector:
         return {
             "timestamp": str(dt),
             "date": str(dt.date()),
-            "time": str(dt.strftime("%H:%M:%S")),
+            "time": dt.strftime("%H:%M:%S"),
             "projected_demand_mw": round(pred_mw, 2),
             "nature_of_value": "MODEL-BASED SCENARIO PROJECTION (Not an observed value)",
             "inputs": input_dict

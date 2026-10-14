@@ -25,6 +25,7 @@ Generated Files:
 
 import os
 import json
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -59,14 +60,15 @@ def run_peak_analysis():
         "lr_pred": lr_df["predicted_demand"],
         "rf_pred": rf_df["predicted_demand"]
     })
-    if has_lstm:
+    if lstm_df is not None:
         df["lstm_pred"] = lstm_df["predicted_demand"]
 
-    df["date"] = df["datetime"].dt.date
-    df["month"] = df["datetime"].dt.month
-    df["hour"] = df["datetime"].dt.hour
-    df["day_name"] = df["datetime"].dt.day_name()
-    df["is_weekend"] = df["datetime"].dt.dayofweek.isin([5, 6])
+    dt_idx = pd.DatetimeIndex(df["datetime"])
+    df["date"] = dt_idx.date
+    df["month"] = dt_idx.month
+    df["hour"] = dt_idx.hour
+    df["day_name"] = dt_idx.day_name()
+    df["is_weekend"] = dt_idx.dayofweek.isin([5, 6])
 
     print(f"Total test rows: {len(df)}, Unique dates: {df['date'].nunique()}")
 
@@ -157,9 +159,9 @@ def run_peak_analysis():
     highest_idx = daily_peaks_df["actual_daily_peak_mw"].idxmax()
     highest_row = daily_peaks_df.loc[highest_idx]
     highest_peak_val = float(highest_row["actual_daily_peak_mw"])
-    highest_peak_dt = pd.to_datetime(highest_row["actual_peak_time"])
-    highest_peak_date = str(highest_peak_dt.date())
-    highest_peak_time = str(highest_peak_dt.strftime("%H:%M:%S"))
+    highest_peak_dt = datetime.fromisoformat(str(highest_row["actual_peak_time"]))
+    highest_peak_date = highest_peak_dt.strftime("%Y-%m-%d")
+    highest_peak_time = highest_peak_dt.strftime("%H:%M:%S")
 
     avg_daily_peak = float(daily_peaks_df["actual_daily_peak_mw"].mean())
     median_daily_peak = float(daily_peaks_df["actual_daily_peak_mw"].median())
@@ -175,7 +177,7 @@ def run_peak_analysis():
     peak_hours_weekend = daily_peaks_df[daily_peaks_df["is_weekend"]]["hour_of_peak"].value_counts().sort_index()
 
     most_common_hour = int(daily_peaks_df["hour_of_peak"].mode()[0])
-    most_common_hour_count = int(daily_peaks_df["hour_of_peak"].value_counts().max())
+    most_common_hour_count = daily_peaks_df["hour_of_peak"].value_counts().max()
     most_common_hour_pct = (most_common_hour_count / len(daily_peaks_df)) * 100
 
     peak_hour_df = pd.DataFrame(index=range(0, 24))
@@ -278,7 +280,7 @@ def run_peak_analysis():
     if has_lstm:
         ax.plot(d_dt, daily_peaks_df["lstm_pred_at_actual_peak_mw"], color="#7B1FA2", linestyle=":", label="LSTM Network", linewidth=1.5, alpha=0.9)
 
-    ax.scatter(highest_peak_dt, highest_peak_val, color="#D32F2F", s=90, zorder=6, label=f"Test Peak: {highest_peak_val:.1f} MW ({highest_peak_date})")
+    ax.scatter(np.array([highest_peak_dt]), np.array([highest_peak_val]), color="#D32F2F", s=90, zorder=6, label=f"Test Peak: {highest_peak_val:.1f} MW ({highest_peak_date})")
     ax.set_title("Delhi Power System: Actual vs. Predicted Daily Peak Demand (Hold-Out Test Period: Mar - Dec 2024)", fontsize=12, fontweight='bold', pad=12)
     ax.set_xlabel("Date", fontsize=11)
     ax.set_ylabel("Peak Power Demand (MW)", fontsize=11)
@@ -291,9 +293,10 @@ def run_peak_analysis():
     # Plot 2: Daily Actual Peak vs Linear Regression
     fig, ax = plt.subplots(figsize=(7.5, 7.5), dpi=150)
     ax.scatter(daily_peaks_df["actual_daily_peak_mw"], daily_peaks_df["lr_pred_at_actual_peak_mw"], color="#D32F2F", alpha=0.6, s=25, label="Daily Peaks (n=272)")
-    lims = [min(daily_peaks_df["actual_daily_peak_mw"].min(), daily_peaks_df["lr_pred_at_actual_peak_mw"].min()) - 150,
-            max(daily_peaks_df["actual_daily_peak_mw"].max(), daily_peaks_df["lr_pred_at_actual_peak_mw"].max()) + 150]
-    ax.plot(lims, lims, color="black", linestyle="--", linewidth=1.5, label="Ideal (y = x)")
+    lim_min = float(min(daily_peaks_df["actual_daily_peak_mw"].min(), daily_peaks_df["lr_pred_at_actual_peak_mw"].min()) - 150)
+    lim_max = float(max(daily_peaks_df["actual_daily_peak_mw"].max(), daily_peaks_df["lr_pred_at_actual_peak_mw"].max()) + 150)
+    lims = (lim_min, lim_max)
+    ax.plot([lims[0], lims[1]], [lims[0], lims[1]], color="black", linestyle="--", linewidth=1.5, label="Ideal (y = x)")
     ax.set_xlim(lims)
     ax.set_ylim(lims)
     ax.set_title(f"Daily Peak Demand: Actual vs. Linear Regression\nDaily Peak MAE = {perf_records[0]['daily_peak_mae_mw']} MW | Peak Error = {perf_records[0]['all_time_peak_error_mw']} MW",
