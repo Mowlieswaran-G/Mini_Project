@@ -1,0 +1,126 @@
+{
+  "timestamp": "2026-10-14",
+  "checks": {
+    "raw_dataset": {
+      "status": "PASS",
+      "file": "powerdemand_5min_2021_to_2024_with weather.csv",
+      "row_count": 393440,
+      "column_count": 15,
+      "columns": [
+        "Unnamed: 0",
+        "datetime",
+        "Power demand",
+        "temp",
+        "dwpt",
+        "rhum",
+        "wdir",
+        "wspd",
+        "pres",
+        "year",
+        "month",
+        "day",
+        "hour",
+        "minute",
+        "moving_avg_3"
+      ],
+      "missing_values": {
+        "Unnamed: 0": 0,
+        "datetime": 0,
+        "Power demand": 0,
+        "temp": 0,
+        "dwpt": 0,
+        "rhum": 0,
+        "wdir": 540,
+        "wspd": 0,
+        "pres": 0,
+        "year": 0,
+        "month": 0,
+        "day": 0,
+        "hour": 0,
+        "minute": 0,
+        "moving_avg_3": 2
+      },
+      "target_leakage_column_present": true
+    },
+    "cleaned_dataset": {
+      "status": "PASS",
+      "file": "cleaned_delhi_powerdemand_5min_2021_to_2024.csv",
+      "row_count": 393440,
+      "column_count": 13,
+      "date_min": "2021-01-01 00:30:00",
+      "date_max": "2024-12-12 00:30:00",
+      "is_chronologically_sorted": true,
+      "duplicate_timestamps": 0,
+      "total_nulls": 0,
+      "target_nulls": 0,
+      "target_min_mw": 1302.08,
+      "target_max_mw": 8631.53,
+      "moving_avg_3_eliminated": true
+    },
+    "feature_engineering": {
+      "status": "PASS",
+      "file": "feature_engineered_delhi_powerdemand_5min_2021_to_2024.csv",
+      "row_count": 393440,
+      "column_count": 19,
+      "all_17_features_present": true,
+      "lag_verification_at_record_peak": {
+        "timestamp": "2024-06-19 15:05:00",
+        "actual_demand": 8631.53,
+        "lag_5min_verified": true,
+        "lag_1hour_verified": true,
+        "lag_24hour_verified": true,
+        "lag_7day_verified": true
+      },
+      "rows_complete_lags": 354123,
+      "rows_incomplete_lags": 39317
+    },
+    "train_test_split": {
+      "status": "PASS",
+      "train_rows": 283298,
+      "test_rows": 70825,
+      "train_start": "2021-01-08 01:00:00",
+      "train_end": "2024-03-05 13:20:00",
+      "test_start": "2024-03-05 13:25:00",
+      "test_end": "2024-12-11 22:25:00",
+      "chronological_order_verified": true,
+      "train_null_count": 0,
+      "test_null_count": 0,
+      "train_target_min": 1302.08,
+      "train_target_max": 7880.74,
+      "test_target_min": 1519.9,
+      "test_target_max": 8631.53
+    },
+    "prediction_alignment": {
+      "status": "PASS",
+      "models": {
+        "Linear Regression": {
+          "file": "linear_regression_test_predictions.csv",
+          "row_count": 70825,
+          "length_matched_to_test": true,
+          "timestamps_matched_to_test": true,
+          "actual_demand_matched_to_test": true,
+          "verified_test_mae": 25.24,
+          "verified_test_rmse": 43.23
+        },
+        "Random Forest": {
+          "file": "random_forest_test_predictions.csv",
+          "row_count": 70825,
+          "length_matched_to_test": true,
+          "timestamps_matched_to_test": true,
+          "actual_demand_matched_to_test": true,
+          "verified_test_mae": 28.17,
+          "verified_test_rmse": 56.29
+        },
+        "LSTM Neural Network": {
+          "file": "lstm_test_predictions.csv",
+          "row_count": 70825,
+          "length_matched_to_test": true,
+          "timestamps_matched_to_test": true,
+          "actual_demand_matched_to_test": true,
+          "verified_test_mae": 27.63,
+          "verified_test_rmse": 47.77
+        }
+      }
+    }
+  }
+}

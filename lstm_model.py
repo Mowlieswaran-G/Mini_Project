@@ -1,40 +1,64 @@
 """
 LSTM Neural Network Architecture and Model Wrapper for Delhi Power Demand Forecasting.
-Provides the PyTorch model and scikit-learn compatible inference wrapper.
+Provides the PyTorch model and scikit-learn compatible inference wrapper with safe import fallback.
 """
 
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-import torch
-import torch.nn as nn
 
+try:
+    import torch
+    import torch.nn as nn
+    HAS_TORCH = True
+except ImportError:
+    from typing import Any
+    torch: Any = None
+    nn: Any = None
+    HAS_TORCH = False
 
-class DemandLSTM(nn.Module):
-    """Deep LSTM Network for Sequential Electricity Demand Projection."""
-    def __init__(self, input_dim=17, hidden_dim=64, num_layers=2, dropout=0.1):
-        super().__init__()
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.num_layers = num_layers
-        self.lstm = nn.LSTM(
-            input_dim,
-            hidden_dim,
-            num_layers=num_layers,
-            batch_first=True,
-            dropout=dropout if num_layers > 1 else 0.0
-        )
-        self.fc = nn.Sequential(
-            nn.Linear(hidden_dim, 32),
-            nn.ReLU(),
-            nn.Linear(32, 1)
-        )
+if HAS_TORCH:
+    class DemandLSTM(nn.Module):
+        """Deep LSTM Network for Sequential Electricity Demand Projection."""
+        def __init__(self, input_dim=17, hidden_dim=64, num_layers=2, dropout=0.1):
+            super().__init__()
+            self.input_dim = input_dim
+            self.hidden_dim = hidden_dim
+            self.num_layers = num_layers
+            self.lstm = nn.LSTM(
+                input_dim,
+                hidden_dim,
+                num_layers=num_layers,
+                batch_first=True,
+                dropout=dropout if num_layers > 1 else 0.0
+            )
+            self.fc = nn.Sequential(
+                nn.Linear(hidden_dim, 32),
+                nn.ReLU(),
+                nn.Linear(32, 1)
+            )
 
-    def forward(self, x):
-        out, _ = self.lstm(x)
-        out = self.fc(out[:, -1, :])
-        return out.squeeze(-1)
+        def forward(self, x):
+            out, _ = self.lstm(x)
+            out = self.fc(out[:, -1, :])
+            return out.squeeze(-1)
+else:
+    class DemandLSTM:
+        """Placeholder when PyTorch is not installed in the local environment."""
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError(
+                "PyTorch is not installed in the current environment. "
+                "Please run 'pip install torch' to use the LSTM architecture."
+            )
 
+        def load_state_dict(self, *args, **kwargs):
+            pass
+
+        def eval(self):
+            return self
+
+        def __call__(self, *args, **kwargs):
+            raise RuntimeError("PyTorch is required for LSTM inference.")
 
 class LSTMModelWrapper:
     """
@@ -43,6 +67,11 @@ class LSTMModelWrapper:
     """
     def __init__(self, model_state_dict, input_dim=17, hidden_dim=64, num_layers=2,
                  seq_len=6, scaler_X=None, scaler_y=None, feature_cols=None):
+        if not HAS_TORCH:
+            raise RuntimeError(
+                "PyTorch is required to execute the LSTMModelWrapper. "
+                "Please install PyTorch in your Python environment."
+            )
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
@@ -52,7 +81,7 @@ class LSTMModelWrapper:
         self.feature_cols = feature_cols
 
         # Reconstruct torch model
-        self.model = DemandLSTM(
+        self.model: Any = DemandLSTM(
             input_dim=input_dim,
             hidden_dim=hidden_dim,
             num_layers=num_layers,
@@ -66,6 +95,9 @@ class LSTMModelWrapper:
         Accepts numpy array or pandas DataFrame of shape (N, 17) or (N, seq_len, 17).
         Returns 1D numpy array of predictions in original MW units.
         """
+        if not HAS_TORCH:
+            raise RuntimeError("PyTorch is required to run LSTM inference.")
+
         if isinstance(X, pd.DataFrame):
             if self.feature_cols is not None:
                 X_vals = X[self.feature_cols].values

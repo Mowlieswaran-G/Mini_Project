@@ -1,0 +1,13 @@
+project-includes = [
+    "**/*.py*",
+]
+
+search-path = [
+    ".",
+    "app",
+]
+
+ignore-missing-imports = [
+    "torch",
+    "torch.*",
+]

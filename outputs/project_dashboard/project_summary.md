@@ -1,62 +1,25 @@
-# Project Summary Report
-## AI-Based Electricity Demand Projection Including Peak Demand Projection for Delhi Power System
+# Project Summary: Delhi Electricity Demand & Peak Projection System
+**Generated:** 2026-10-14 10:20:42 | **Evaluation Period:** March 5, 2024 13:25:00 to December 11, 2024 22:25:00
 
-### 1. Project Workflow & Methodology
-```
-Delhi SLDC-based Electricity Demand & Weather Data (2021-2024)
-        ↓
-Data preprocessing (leakage removal, causal imputation)
-        ↓
-Exploratory Data Analysis (diurnal, seasonal, weather correlations)
-        ↓
-Feature engineering (17 causal calendar, lag, & weather features)
-        ↓
-Chronological train/test split (80% train / 20% hold-out test)
-        ↓
-Linear Regression + Random Forest model training
-        ↓
-Model evaluation & comparative benchmarking
-        ↓
-Dedicated daily & monthly peak demand analysis
-        ↓
-Scenario-based peak demand projection module
-```
+## 1. System Overview
+- **Goal:** Project granular 5-minute power demand and evaluate extreme peak demand risks for the Delhi power system.
+- **Dataset:** 393,440 5-minute telemetry intervals (2021–2024) from Delhi State Load Despatch Centre with matching weather.
+- **Zero-Leakage Engineering:** Causal forward-fill for wind direction, removal of unlagged moving averages, exact retrospective lag matching.
 
-### 2. Dataset & Quality Metrics
-- **Total Cleaned Observations:** `393,440` rows (5-minute observations with some missing intervals)
-- **Date Range:** `2021-01-01 00:30:00 to 2024-12-12 00:30:00`
-- **Features Used:** `17` input features
-- **Chronological Train Split:** `283,298` rows (80.0%)
-- **Chronological Test Split:** `70,825` rows (20.0%)
-- **Missing Values Post-Preprocessing:** `0`
-- **Documented Time Gaps:** `1,150` transitions
+## 2. Validated Multi-Model Results (70,825 Hold-Out Test Rows)
 
-### 3. Model Benchmark Summary (Hold-out Test Period)
-| Metric | Linear Regression Baseline | Random Forest Regression |
-| :--- | :---: | :---: |
-| **Test MAE** | `25.24 MW` | `28.17 MW` |
-| **Test RMSE** | `43.23 MW` | `56.29 MW` |
-| **Test R²** | `0.9990` | `0.9983` |
-| **Training Time** | `0.42 s` | `140.85 s` |
-| **Prediction Time** | `0.05 s` | `1.02 s` |
+| Model | Test MAE (MW) | Test RMSE (MW) | R² Score | Peak Error at 8,631.5 MW | Daily Peak MAE (MW) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Linear Regression** | **25.24** | **43.23** | **0.9990** | **-71.12 MW (-0.82%)** | **39.86** |
+| **Random Forest (100 Trees)** | 28.17 | 56.29 | 0.9983 | -954.21 MW (-11.05%) | 63.88 |
+| **PyTorch LSTM Network** | 27.63 | 47.77 | 0.9987 | -451.86 MW (-5.23%) | 61.62 |
 
-### 4. Peak Demand Analysis & Model Peak Evaluation
-- **Highest Observed Demand in Test Period:** `8,631.53 MW` on `2024-06-19 15:05:00`
-- **Linear Regression Prediction at Peak:** `8,560.41 MW` (Error: `-71.12 MW` / `-0.82%`)
-- **Random Forest Prediction at Peak:** `7,677.32 MW` (Error: `-954.21 MW` / `-11.05%`)
-- **Daily Peak MAE (272 days):** Linear Regression = `39.86 MW` | Random Forest = `63.88 MW`
-- **Daily Peak RMSE (272 days):** Linear Regression = `72.07 MW` | Random Forest = `136.40 MW`
-- **Average Daily Peak Demand:** `5,519.61 MW` (Median: `5,393.60 MW`)
-- **Most Common Peak Hour:** Hour `15:00` (3 PM), occurring on `89` out of 272 days (`32.7%`)
+## 3. Key Findings on Peak Demand
+1. **Decision Tree Bounding:** Random Forest under-predicts unprecedented heatwave peaks because its leaves cannot extrapolate beyond training set boundaries (~7,746 MW).
+2. **Linear Extrapolation:** Linear Regression maintains linear sensitivity, accurately projecting the 8,631.53 MW peak with -0.82% error.
+3. **LSTM Sequential Modeling:** The 2-layer LSTM cuts Random Forest's peak under-prediction error by more than half (-5.23% error).
 
-### 5. Illustrative Scenario Projection
-> **LABEL:** `MODEL-BASED SCENARIO PROJECTION — NOT AN OBSERVED VALUE`
-- **Projected Peak Demand:** `8,560.23 MW`
-- **Projected Peak Timestamp:** `2025-06-20 15:15:00`
-- **Scenario Temperature at Peak:** `43.8 °C`
-
-### 6. File Artifacts Created in Step 12
-- HTML Dashboard: `outputs\project_dashboard\project_dashboard.html`
-- Markdown Summary: `outputs\project_dashboard\project_summary.md`
-- Composite Overview Chart: `outputs\project_dashboard\dashboard_overview_chart.png`
-- Scenario Trajectory Chart: `outputs\project_dashboard\dashboard_scenario_chart.png`
+## 4. Key Limitations
+- Absence of live SCADA telemetry feed (relies on historical data or manual inputs).
+- Recursive error accumulation during long forward forecasting horizons.
+- Dependence on upstream meteorological forecast accuracy.

@@ -1,4 +1,4 @@
-Category,Metric,Unit,Linear Regression,Random Forest,LSTM,Advantage / Characteristic
+﻿﻿Category,Metric,Unit,Linear Regression,Random Forest,LSTM,Advantage / Characteristic
 Overall Test Performance,MAE (Mean Absolute Error),MW,25.24,28.17,27.63,LR lowest overall error
 Overall Test Performance,RMSE (Root Mean Squared Error),MW,43.23,56.29,47.77,LR penalizes extremes least
 Overall Test Performance,R² Score,Dimensionless,0.999,0.9983,0.9987,All models explain >99.8% variance

@@ -1,3 +1,4 @@
-model,daily_peak_mae_mw,daily_peak_rmse_mw,mean_percentage_error_pct,mean_absolute_percentage_error_pct,max_absolute_peak_error_mw,all_time_peak_pred_mw,all_time_peak_error_mw,all_time_peak_error_pct
-Linear Regression,39.86,72.07,-0.56,0.77,611.24,8560.41,-71.12,-0.82
-Random Forest,63.88,136.4,-0.83,1.07,956.38,7677.32,-954.21,-11.05
+model,daily_peak_mae_mw,daily_peak_rmse_mw,mean_percentage_error_pct,mean_absolute_percentage_error_pct,max_absolute_peak_error_mw,peak_timing_mae_mins,all_time_peak_pred_mw,all_time_peak_error_mw,all_time_peak_error_pct
+Linear Regression,39.86,72.07,-0.56,0.77,611.24,28.3,8560.41,-71.12,-0.82
+Random Forest,63.88,136.4,-0.83,1.07,956.38,65.8,7677.32,-954.21,-11.05
+LSTM Neural Network,61.62,139.2,-0.9,1.04,1608.31,62.4,8179.67,-451.86,-5.23
