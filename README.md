@@ -98,10 +98,10 @@ Traditional non-linear machine learning models (such as tree-based ensembles) pa
                                          ▼
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                       STEP 5: INTERACTIVE DEPLOYMENT                            │
-│   • Streamlit Web Application (app/app.py) with 10 Structured Sections          │
+│   • Streamlit Web Application (app/app.py) with 8 Modular Operational Views     │
 │   • Standalone Multi-Model HTML Dashboard (outputs/project_dashboard/)          │
-│   • Automated Autoregressive Lag Estimator & Heat Index Calculator              │
-│   • Docker Containerization & Multi-Model Inference API                         │
+│   • Autonomous Multi-Step Forward Predictor (1h, 24h, 7d Horizons)              │
+│   • Docker Orchestration with Live Model Volume Mounts & Health Checks          │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -212,27 +212,78 @@ Error distribution evaluated across quantile-based grid operating tiers:
 
 ## 8. Interactive Web Application (Streamlit)
 
-The web dashboard is located in [`app/app.py`](app/app.py) and is organized into 10 structured operational sections:
-1. **🏠 Project Overview:** System architecture, telemetry summary, and model characteristics.
-2. **🧹 Dataset & Data Quality:** Preprocessing audit, zero-leakage verification, and data table explorer.
-3. **📊 Exploratory Data Analysis:** Diurnal curves, weekly profiles, seasonal variation, and temperature scatter.
-4. **🤖 Model Comparison:** Side-by-side benchmark metrics and residual error histograms.
-5. **🔮 Demand Forecasting:** Recursive forward projections (Next 1 Hour, Next 24 Hours, Next 7 Days) with CSV export.
-6. **🏔️ Peak-Demand Analysis:** Test period peak events, actual peak timestamps vs. model maximum values, and diurnal peak frequency.
-7. **🌦️ Weather Scenario Analysis:** Interactive What-If simulation with physical boundary validation and optional Open-Meteo live weather query.
-8. **🚨 Forecast Alerts & Regimes:** Operational tier classification with user-configurable simulation alert thresholds.
-9. **🎯 Model Evaluation & Residuals:** Hold-out test residual plots and actual vs. predicted overlays.
-10. **📥 Downloadable Reports:** Download CSV reports for model comparisons, daily peaks, and project summaries.
+The web dashboard is located in [`app/app.py`](app/app.py) and is powered by an enterprise-grade UI design system featuring **Plus Jakarta Sans** and **JetBrains Mono** typography, pastel metric card accents, Plotly spline curves, and a floating sidebar navigation with live AI model status badges. It is organized into **8 modular operational views**:
+
+1. **📊 Dashboard (Executive Operations & Grid Stability):**
+   - **Sudden Interruption Monitoring:** High-resolution telemetry tracking sudden load dips and rapid ramp-rate excursions in real time.
+   - **Financial Collection & Due Margin:** Summer peak collection vs. spinning reserve margin monitor with critical threshold alerts.
+   - **Quarterly Revenue Trajectory:** Dynamic pill cards tracking DISCOM monthly revenue performance and seasonal demand spikes.
+   - **Generation vs. Consumption:** Dual-spline waveform overlay comparing scheduled generation dispatch against actual consumer load with historical peak callouts.
+   - **Load Shedding Prevention:** Automated tracker computing total load shedding hours avoided across Delhi distribution zones.
+   - **New Consumer Growth:** Sector-wise active connection breakdown across Commercial High-Rise, Industrial Parks, EV Fast Charging, Residential Domestic, and Institutional sectors.
+
+2. **📈 Performance (Model Benchmark & Regime Analytics):**
+   - **Pastel Metric Grid:** 6 live grid performance tiles (Total Generation GWh, 99.8% System Uptime, Outage / Fall Time, Active Substations, Resolved Grid Alerts, Online Telemetry Nodes).
+   - **Generation Profile & Substation Availability:** Monthly generation spline curves and availability uptime bar charts.
+   - **Outage Trend & Consumer Trajectory:** Unplanned outage reduction curves alongside annual connection expansions.
+   - **Demand Regime Share:** Interactive donut distribution across Normal ($\le 5,589$ MW), High ($5,589 - 6,906$ MW), and Extreme Peak ($> 6,906$ MW) operating tiers.
+   - **Model Benchmark Suite:** Multi-model comparative metrics ($MAE$, $RMSE$, $R^2$) and residual error analysis.
+
+3. **🗺️ Distribution (Delhi NCT 5 DISCOM Zones):**
+   - **Zonal Jurisdiction Coverage:** Dedicated operational monitoring for Delhi's 5 distribution utilities:
+     - **BRPL** (BSES Rajdhani Power Limited — South & West Delhi)
+     - **BYPL** (BSES Yamuna Power Limited — Central & East Delhi)
+     - **TPDDL** (Tata Power Delhi Distribution Limited — North & North-West Delhi)
+     - **NDMC** (New Delhi Municipal Council — Lutyens' VIP Delhi)
+     - **MES** (Military Engineer Services — Delhi Cantonment Area)
+   - **Financial & Operational Pills:** Bill collections, pending due margin, electricity consumed (kWh), and active feeder counts.
+   - **Consumption Details Waveform:** Multi-month demand curves with automated peak demand callouts.
+   - **Substation Telemetry Explorer:** Filterable feeder table reporting voltage class (33 kV / 66 kV / 220 kV), transformer loading percentages, and active health badges.
+
+4. **👥 Consumer & Telemetry (SLDC Telemetry Data Explorer):**
+   - **Full Telemetry Span:** Interactive query engine over 393,440 historical 5-minute SLDC dispatch records (2021–2024) and 70,825 hold-out evaluation records.
+   - **Sector Consumption Profiles:** Demand breakdown by Domestic, Commercial, Industrial, and EV mobility categories.
+   - **Hourly Dispatch Profiling:** Intraday diurnal demand curves with interactive peak timestamp indicators.
+   - **Live Telemetry Table:** Searchable, paginated record browser with zero-leakage data validation badges.
+
+5. **🔮 Forecast Studio (Autonomous Multi-Step Forward AI Engine):**
+   - **Multi-Horizon Recursive Forecasting:**
+     - **Next 1 Hour:** 12 sequential 5-minute dispatch steps
+     - **Next 24 Hours:** 288 steps intraday dispatch projection
+     - **Next 7 Days:** 2,016 steps weekly cyclical forecast
+   - **Dynamic Engine Selector:** Seamlessly switch between **Linear Regression**, **100-Tree Random Forest**, and **PyTorch LSTM**.
+   - **Forecast Summary KPIs:** Real-time computation of Projected Peak Demand (MW), Projected Average Load (MW), Volatility Spread, and Peak Timestamp.
+   - **Interactive Forecast Visualizer:** High-resolution Plotly line chart with past context, forecasted trajectory, and shaded confidence bounds.
+   - **One-Click Export:** Download full multi-step projected dispatch series as CSV.
+
+6. **🌦️ Weather Scenarios (Atmospheric & Heat-Index Simulator):**
+   - **Meteorological Stress Sliders:** Interactive controls for Ambient Temperature (10 °C to 50 °C), Dew Point (0 °C to 35 °C), Relative Humidity (10% to 100%), Wind Speed, Wind Direction, and Barometric Pressure.
+   - **Apparent Heat Index Engine:** Real-time formulaic computation of apparent heat index with National Weather Service risk categories (*Caution*, *Extreme Caution*, *Danger*, *Extreme Danger*).
+   - **What-If Grid Sensitivity Analysis:** Live simulation of extreme summer heatwaves and monsoon mugginess on peak dispatch demands.
+
+7. **🏔️ Peak Analysis (Historical Peak Case Studies & Benchmarks):**
+   - **Historic Peak Case Study:** Micro-level breakdown of Delhi's unprecedented all-time record of **8,631.53 MW** (19 June 2024 at 15:05 IST).
+   - **Model Error Dissection:** Side-by-side error comparison (LR: $-71.12$ MW / $-0.82\%$, LSTM: $-451.86$ MW / $-5.23\%$, RF: $-954.21$ MW / $-11.05\%$).
+   - **272 Monitored Daily Peaks:** Daily peak demand scatter, diurnal peak hour histogram, and monthly maximum demand progression.
+   - **Residual Visualizations:** Multi-model error distributions across extreme demand quantiles.
+
+8. **📑 Reports & Audit (Technical Documentation & Verified Artifacts):**
+   - **Instant Downloads:** One-click direct downloads for `model_comparison_delhi_powerdemand.csv`, `daily_peak_analysis.csv`, `peak_model_performance.csv`, and the standalone offline `project_dashboard.html`.
+   - **Documentation Links:** Direct access to technical methodology, verification reports, and testing audits.
+   - **Data Quality Badges:** Verified zero-null, zero synthetic interpolation, and strict chronological split status.
 
 ---
 
 ## 9. Documentation & Audit Reports
 
-- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): Comprehensive documentation of preprocessing, feature engineering, and model designs.
-- [`docs/MODEL_EVALUATION.md`](docs/MODEL_EVALUATION.md): In-depth benchmark tables, regime breakdowns, and peak error analysis.
-- [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md): Transparent documentation of real-world boundaries, recursive lag accumulation, and weather dependencies.
-- [`docs/DATA_QUALITY_REPORT.md`](docs/DATA_QUALITY_REPORT.md): Data pipeline audit confirming zero leakage and chronological discipline.
-- [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md): Automated test execution report detailing 19 verified PASS outcomes.
+- [`docs/FINAL_VERIFICATION_REPORT.md`](docs/FINAL_VERIFICATION_REPORT.md): Comprehensive end-to-end audit confirming model persistence, prediction alignments, feature pipeline integrity, and Docker deployment readiness.
+- [`docs/UI_FUNCTIONALITY_AUDIT.md`](docs/UI_FUNCTIONALITY_AUDIT.md): In-depth technical audit of all 8 application views, layout isolation, responsive components, CSS design tokens, and state preservation.
+- [`docs/UI_FIX_VERIFICATION_REPORT.md`](docs/UI_FIX_VERIFICATION_REPORT.md): Verification report covering UI enhancements, LSTM causal rolling buffers, scenario calendar derivations, and automated regression tests.
+- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md): Mathematical derivations, causal feature engineering specifications (17 features), and model training protocols.
+- [`docs/MODEL_EVALUATION.md`](docs/MODEL_EVALUATION.md): In-depth benchmark tables, demand regime breakdowns, and extreme peak error analysis across all 70,825 test steps.
+- [`docs/DATA_QUALITY_REPORT.md`](docs/DATA_QUALITY_REPORT.md): Data pipeline audit confirming zero target leakage, absence of synthetic timestamps, and causal forward-fill protocols.
+- [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md): Transparent documentation of real-world operational boundaries, multi-step error accumulation, and weather persistence assumptions.
+- [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md): Automated test execution report detailing 28 verified PASS outcomes across 8 test suites.
 
 ---
 
@@ -240,30 +291,38 @@ The web dashboard is located in [`app/app.py`](app/app.py) and is organized into
 
 ```
 Mini_Project/
-├── app/                                       # Streamlit Web Application
-│   ├── .streamlit/config.toml                 # Custom UI Theme configuration
-│   ├── app.py                                 # Main Streamlit Dashboard (10 Sections)
+├── app/                                       # Production Streamlit Web Application
+│   ├── .streamlit/config.toml                 # Custom UI Theme configuration (Plus Jakarta Sans)
+│   ├── app.py                                 # Main Streamlit Dashboard (8 Modular Views)
 │   ├── lstm_model.py                          # Application copy of LSTM model wrapper
 │   └── utils/
 │       ├── data.py                            # Caching, model loaders & telemetry helpers
 │       └── features.py                        # Causal feature generator, physical bounds & validation
 ├── docs/                                      # Comprehensive Technical Documentation
+│   ├── FINAL_VERIFICATION_REPORT.md           # End-to-end system verification & deployment sign-off
+│   ├── UI_FUNCTIONALITY_AUDIT.md              # Technical audit across all 8 views and UI components
+│   ├── UI_FIX_VERIFICATION_REPORT.md          # Verification report for UI & functional fixes
 │   ├── METHODOLOGY.md                         # Pipeline and feature engineering details
 │   ├── MODEL_EVALUATION.md                    # Detailed model comparisons & regime analytics
 │   ├── LIMITATIONS.md                         # Real-world limitations & error accumulation
 │   ├── DATA_QUALITY_REPORT.md                 # Data quality and zero-leakage audit
-│   ├── UI_FUNCTIONALITY_AUDIT.md              # Comprehensive UI audit across all 10 app sections
-│   ├── UI_FIX_VERIFICATION_REPORT.md          # Verification report for the 8 UI and functional fixes
-│   └── TEST_REPORT.md                         # Automated unit tests execution report
+│   └── TEST_REPORT.md                         # Automated unit tests execution report (28 tests)
 ├── outputs/                                   # Audited Evaluation Artifacts
 │   ├── linear_regression/                     # LR plots and metrics.json
 │   ├── random_forest/                         # RF plots, feature importances and metrics.json
 │   ├── lstm/                                  # LSTM convergence, zoomed peak & metrics.json
 │   ├── model_comparison/                      # Benchmark plots, reports and comparison summary
-│   ├── peak_analysis/                         # Daily peaks, hourly distribution and performance CSVs
+│   ├── peak_analysis/                         # 7 Analytical peak charts and performance CSVs
+│   │   ├── 1_daily_actual_peak_demand_over_time.png
+│   │   ├── 2_daily_actual_vs_lr_predicted_peak.png
+│   │   ├── 3_daily_actual_vs_rf_predicted_peak.png
+│   │   ├── 4_daily_actual_vs_lstm_predicted_peak.png
+│   │   ├── 5_monthly_maximum_demand.png
+│   │   ├── 6_distribution_of_daily_peak_hours.png
+│   │   └── 7_peak_prediction_error_comparison.png
 │   ├── peak_projection/                       # Scenario simulation reports and charts
 │   └── project_dashboard/                     # HTML standalone dashboard & overview charts
-├── tests/                                     # Automated Unit & Integration Tests
+├── tests/                                     # Automated Unit & Integration Tests (28 Tests)
 │   ├── test_data_validation.py                # Dataset checks and chronological split boundaries
 │   ├── test_feature_engineering.py            # Feature schema and exact lag mapping
 │   ├── test_models.py                         # Model loading and inference verification
@@ -298,7 +357,7 @@ Mini_Project/
 ├── project_results_dashboard.py               # Step 11: Export standalone HTML dashboard
 ├── data_quality_report.py                     # Automated data quality audit generator
 ├── Dockerfile                                 # Production container definition
-├── docker-compose.yml                         # Container orchestration configuration
+├── docker-compose.yml                         # Container orchestration configuration (Volume mounts)
 └── requirements.txt                           # Python project dependencies
 ```
 
@@ -313,7 +372,7 @@ Mini_Project/
 ### 1. Set Up Environment
 ```bash
 git clone <repository-url>
-cd Miniproject
+cd Mini_Project
 ```
 
 ### 2. Install Dependencies
@@ -341,7 +400,7 @@ Outputs `outputs/project_dashboard/project_dashboard.html`, which can be opened 
 
 ## 12. Automated Test Suite
 
-Run the full automated test suite covering data validation, feature generation, model loading, prediction alignment, peak analysis, and dashboard generation:
+Run the full automated test suite covering data validation, feature generation, model loading, prediction alignment, peak analysis, weather forecasting bounds, dashboard generation, and UI fixes:
 
 ```bash
 python -m unittest discover tests
@@ -349,9 +408,22 @@ python -m unittest discover tests
 
 Expected outcome:
 ```text
-Ran 28 tests in ~7.0s
+Ran 28 tests in ~6.0s
 OK (All 28 tests PASS)
 ```
+
+### Test Suite Breakdown (8 Test Modules, 28 Tests)
+
+| Test Module | Coverage & Verification Focus | Test Count |
+|:---|:---|:---:|
+| [`tests/test_data_validation.py`](tests/test_data_validation.py) | Raw dataset integrity, null checks, row counts, and chronological split boundaries (80/20) | 4 |
+| [`tests/test_feature_engineering.py`](tests/test_feature_engineering.py) | 17 causal feature schema, exact retrospective lag subtractions (5m, 1h, 24h, 7d), and zero lookahead | 5 |
+| [`tests/test_models.py`](tests/test_models.py) | Serialization checks, PyTorch/scikit-learn model loading, and forward pass sanity | 3 |
+| [`tests/test_predictions_alignment.py`](tests/test_predictions_alignment.py) | 70,825 test prediction alignment, metrics consistency, and column schemas | 3 |
+| [`tests/test_peak_analysis.py`](tests/test_peak_analysis.py) | Daily peak extraction, historic 8,631.53 MW record detection, and peak error metrics | 4 |
+| [`tests/test_weather_and_forecasting.py`](tests/test_weather_and_forecasting.py) | Physical meteorological bounds validation, heat index calculation, and scenario presets | 4 |
+| [`tests/test_dashboard_and_reports.py`](tests/test_dashboard_and_reports.py) | Standalone HTML dashboard generation, file size (>500 KB), and report consistency | 3 |
+| [`tests/test_ui_fixes.py`](tests/test_ui_fixes.py) | LSTM rolling sequence shapes `(1, 6, 17)`, causal roll shifts, scenario date/time derivations, and UI stability | 2 |
 
 ---
 
@@ -367,14 +439,42 @@ OK (All 28 tests PASS)
 
 ## 14. Docker Deployment
 
-Deploy using Docker:
+The application includes a production-ready Docker configuration featuring **volume-mounted model artifacts**, hot-reloadable application code, and integrated health checks.
+
+### 1. Launch with Docker Compose (Recommended)
 ```bash
-docker build -t delhi-power-demand:latest .
-docker run -d -p 8501:8501 --name power-predict-app delhi-power-demand:latest
+docker compose up -d --build
 ```
 
-Or with Docker Compose:
+### 2. Verify Container Health
 ```bash
-docker compose up -d
+docker compose ps
 ```
-Access the application at `http://localhost:8501`.
+The container includes a built-in healthcheck probing `http://localhost:8501/_stcore/health` every 30 seconds.
+
+### 3. View Real-Time Logs
+```bash
+docker compose logs -f
+```
+
+### 4. Stop the Container
+```bash
+docker compose down
+```
+
+### Direct Docker CLI Alternative
+```bash
+docker build -t delhi-power-demand:latest .
+docker run -d \
+  -p 8501:8501 \
+  -v "${PWD}/app:/app/app" \
+  -v "${PWD}/random_forest_delhi_powerdemand.pkl:/app/random_forest_delhi_powerdemand.pkl" \
+  --name power-predict-app \
+  delhi-power-demand:latest
+```
+
+Access the live dashboard at **`http://localhost:8501`**.
+
+> [!NOTE]
+> **Optimized Image Architecture:** The 740 MB Random Forest pickle model is volume-mounted directly from the host (`./random_forest_delhi_powerdemand.pkl:/app/random_forest_delhi_powerdemand.pkl`) rather than baked into the Docker image layer. This keeps the image lightweight, avoids multi-gigabyte build contexts, and enables instant zero-rebuild code updates via `./app:/app/app`.
+
