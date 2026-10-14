@@ -8,6 +8,6 @@ joblib>=1.3.0
 matplotlib>=3.7.0
 seaborn>=0.12.0
 
-# Deep Learning (PyTorch required for LSTM neural network inference & training)
-# For CPU-only installations: pip install torch --index-url https://download.pytorch.org/whl/cpu
+# Deep Learning (CPU wheel for fast, lightweight cloud deployment)
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch>=2.0.0
